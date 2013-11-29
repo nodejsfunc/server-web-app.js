@@ -1,6 +1,6 @@
 {
   "name": "BlinkNode",
-  "version": "0.0.3-0",
+  "version": "0.0.0-0",
   "dependencies": {
     "express": "3.x",
     "jade": "*",
