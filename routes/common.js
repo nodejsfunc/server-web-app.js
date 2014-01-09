@@ -69,6 +69,10 @@ exports.index = function (req, res) {
 			// handle requests that do not require a service call
 			if(secondPathComponent === global.const.LOCAL_PATH){
 				var path = req.url.substring(req.url.indexOf(thirdPathComponent)-1, req.url.length);   // strip off the first and second path component
+
+        // return server web app version number
+        res.setHeader('X-Powered-By', global.app_name + global.app_version);
+
 				if(path === global.const.SIGN_OUT_PATH){
 					var access_token = req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME];
 
