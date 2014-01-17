@@ -20,16 +20,19 @@ exports.index = function (req, res) {
 
   if (pathComponents.length >= 3) { // we need at least three path components e.g. /api/service/catalogue or /api/auth/oauth2
     var domains = global.api_domains;
+
     var secondPathComponent = pathComponents[1];
     var thirdPathComponent = pathComponents[2];
+    var fourthPathComponent = pathComponents[3];
 
     if (domains.hasOwnProperty(secondPathComponent)) { // take the second path component and use it to look up the target domain
-      var domain = domains[secondPathComponent];
+
+      var domain = (domains.hasOwnProperty(thirdPathComponent)) ? (thirdPathComponent === 'my') ? domains[fourthPathComponent] : domains[thirdPathComponent] : domains[secondPathComponent];
       options = domain.options;
 
       if (domain.hasOwnProperty('root') && domain.root.length > 0) {
         // if there is a root, use this as the start of the URI
-        options.path = '/'+domain.root+req.url.substring(req.url.indexOf(thirdPathComponent)-1, req.url.length);   // strip off the first and second path component
+        options.path = '/service'+req.url.substring(req.url.indexOf(thirdPathComponent)-1, req.url.length);   // strip off the first and second path component
       }
       else {
         // else start from the third component
