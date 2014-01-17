@@ -1,5 +1,5 @@
 {
-  "timeout":  20,
+  "timeout":  40,
   "databaseDomain": "127.0.0.1",
   "databasePort": 6379,
 	"clientConfig": {
@@ -9,7 +9,7 @@
 	},
   "domains": {
     "catalogue": {
-      "root": "catalogue",
+      "root": "service",
       "options": {
         "host": "backend-build-2",
         "port": 9128,
@@ -17,26 +17,8 @@
         }
       }
     },
-    "marketing": {
-      "root": "marketing",
-      "options": {
-        "host": "backend-build-2",
-        "port": 9130,
-        "headers": {
-        }
-      }
-    },
-    "search": {
-      "root": "search",
-      "options": {
-        "host": "backend-build-2",
-        "port": 9131,
-        "headers": {
-        }
-      }
-    },
     "baskets": {
-      "root": "baskets",
+      "root": "service",
       "options": {
         "host": "backend-build-2",
         "port": 9132,
@@ -44,8 +26,26 @@
         }
       }
     },
+    "marketing": {
+      "root": "service",
+      "options": {
+        "host": "backend-build-2",
+        "port": 9130,
+        "headers": {
+        }
+      }
+    },
+    "library": {
+      "root": "service",
+      "options": {
+        "host": "backend-build-2",
+        "port": 9129,
+        "headers": {
+        }
+      }
+    },
     "payments": {
-      "root": "payments",
+      "root": "service",
       "options": {
         "host": "backend-build-2",
         "port": 9133,
@@ -53,17 +53,8 @@
         }
       }
     },
-    "creditcards": {
-      "root": "creditcards",
-      "options": {
-        "host": "backend-build-2",
-        "port": 9134,
-        "headers": {
-        }
-      }
-    },
     "clubcards": {
-      "root": "clubcards",
+      "root": "service",
       "options": {
         "host": "backend-build-2",
         "port": 9135,
@@ -71,16 +62,16 @@
         }
       }
     },
-    "service": {
+    "creditcards": {
       "root": "service",
       "options": {
-        "host": "qa.mobcastdev.com",
-        "port": 80,
+        "host": "backend-build-2",
+        "port": 9134,
         "headers": {
         }
       }
     },
-    "secure-service": {
+    "credit": {
       "root": "service",
       "options": {
         "host": "qa.mobcastdev.com",
@@ -89,7 +80,7 @@
         }
       }
     },
-    "auth": { 
+    "auth": {
       "root": "",
       "options": {
         "host":   "auth.mobcastdev.com",
@@ -103,6 +94,15 @@
       "options": {
         "host": "internal-media.mobcastdev.com",
         "port": 80,
+        "headers": {
+        }
+      }
+    },
+    "secure-service": {
+      "root": "service",
+      "options": {
+        "host": "backend-build-2",
+        "port": 443,
         "headers": {
         }
       }

@@ -65,7 +65,7 @@ exports.getResults = function (req, res, options) {
 	};
 
 	var _isBasketService = function(){
-		return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.BASKET_PATH) === 0;
+    return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.BASKET_PATH) === 0;
 	};
 
 	var _isPurchaseService = function(){

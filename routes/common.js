@@ -25,14 +25,28 @@ exports.index = function (req, res) {
     var thirdPathComponent = pathComponents[2];
     var fourthPathComponent = pathComponents[3];
 
-    if (domains.hasOwnProperty(secondPathComponent)) { // take the second path component and use it to look up the target domain
+    console.log(secondPathComponent, thirdPathComponent, fourthPathComponent, req.url.substring(req.url.indexOf(thirdPathComponent)-1, req.url.length));
 
-      var domain = (domains.hasOwnProperty(thirdPathComponent)) ? (thirdPathComponent === 'my') ? domains[fourthPathComponent] : domains[thirdPathComponent] : domains[secondPathComponent];
+    if (domains.hasOwnProperty(secondPathComponent) || domains.hasOwnProperty(thirdPathComponent)  || domains.hasOwnProperty(fourthPathComponent)) { // take the second path component and use it to look up the target domain
+
+      var domain = domains[secondPathComponent];
+
+      if(thirdPathComponent === 'my') {
+        domain = domains[fourthPathComponent];
+        if(fourthPathComponent === 'baskets') {
+          console.log(domain);
+        }
+      }
+
+      if(secondPathComponent === 'service') {
+        domain = domains[thirdPathComponent];
+      }
+
       options = domain.options;
 
       if (domain.hasOwnProperty('root') && domain.root.length > 0) {
         // if there is a root, use this as the start of the URI
-        options.path = '/service'+req.url.substring(req.url.indexOf(thirdPathComponent)-1, req.url.length);   // strip off the first and second path component
+        options.path = '/'+domain.root+req.url.substring(req.url.indexOf(thirdPathComponent)-1, req.url.length);    // strip off the first and second path component
       }
       else {
         // else start from the third component
