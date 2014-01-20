@@ -42,6 +42,10 @@ exports.index = function (req, res) {
         domain = domains[thirdPathComponent];
       }
 
+      if(secondPathComponent === 'search') {
+        domain = domains[secondPathComponent];
+      }
+
       options = domain.options;
 
       if (domain.hasOwnProperty('root') && domain.root.length > 0) {

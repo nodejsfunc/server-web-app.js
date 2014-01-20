@@ -62,6 +62,15 @@
         }
       }
     },
+    "search": {
+      "root": "service",
+      "options": {
+        "host": "backend-build-2",
+        "port": 9131,
+        "headers": {
+        }
+      }
+    },
     "creditcards": {
       "root": "service",
       "options": {
