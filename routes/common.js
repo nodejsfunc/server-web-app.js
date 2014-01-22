@@ -25,7 +25,7 @@ exports.index = function (req, res) {
     var thirdPathComponent = pathComponents[2];
     var fourthPathComponent = pathComponents[3];
 
-    console.log(secondPathComponent, thirdPathComponent, fourthPathComponent, req.url.substring(req.url.indexOf(thirdPathComponent)-1, req.url.length));
+    //console.log(secondPathComponent, thirdPathComponent, fourthPathComponent, req.url.substring(req.url.indexOf(thirdPathComponent)-1, req.url.length));
 
     if (domains.hasOwnProperty(secondPathComponent) || domains.hasOwnProperty(thirdPathComponent)  || domains.hasOwnProperty(fourthPathComponent)) { // take the second path component and use it to look up the target domain
 
@@ -56,6 +56,11 @@ exports.index = function (req, res) {
         // else start from the third component
 				options.path = req.url.substring(req.url.indexOf(thirdPathComponent)-1, req.url.length);   // strip off the first and second path component
       }
+
+      if(thirdPathComponent === 'clubcards') {
+        options.port = 9135;
+      }
+
 
 			// if path is requesting user details, append user id to url
 			if(options.host === domains.auth.options.host &&
