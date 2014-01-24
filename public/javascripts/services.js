@@ -35,7 +35,7 @@ exports.getResults = function (req, res, options) {
 
   var proxy_request_body;
 
-  // Build proxy request headers by copying across request headers from client request 
+  // Build proxy request headers by copying across request headers from client request
   var headers = {};
   for(var header in req.headers) {
     if (req.headers.hasOwnProperty(header)) {

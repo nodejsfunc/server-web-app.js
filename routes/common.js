@@ -6,7 +6,7 @@
  * Common route
  *
  * Routes all incoming requests
- * 
+ *
  * @param req
  * @param res
  */
