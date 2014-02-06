@@ -198,7 +198,7 @@ exports.getResults = function (req, res, options) {
 
               // handle persistent and non-persistent authentication
               var expiresDate = req.param(global.const.AUTH_PARAM_REMEMBER_ME) === 'true' ? new Date(Date.now() + global.const.AUTH_MAX_AGE) : null;
-              res.cookie(global.const.AUTH_ACCESS_TOKEN_NAME, access_token, { expires: expiresDate, httpOnly: true, secure: true });
+              res.cookie(global.const.AUTH_ACCESS_TOKEN_NAME, access_token, { path: '/api', expires: expiresDate, httpOnly: true, secure: true });
 
               _updateAccessToken(req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME], access_token, JSON.stringify({refresh_token:refresh_token, user_id: user_id, remember_me: expiresDate !== null}));
             }
