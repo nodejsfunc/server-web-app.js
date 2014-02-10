@@ -80,7 +80,7 @@ exports.index = function (req, res) {
 					global.repository.del(access_token);
 
 					// delete cookie in browser
-					res.clearCookie(global.const.AUTH_ACCESS_TOKEN_NAME);
+					res.clearCookie(global.const.AUTH_ACCESS_TOKEN_NAME, { path: '/api' });
 
 					res.send(200, null);
 					res.end();
