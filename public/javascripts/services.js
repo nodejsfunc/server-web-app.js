@@ -327,7 +327,6 @@ exports.getResults = function (req, res, options) {
 			// if token invalid/expired
 			var error_message = proxy_response.headers['www-authenticate'] || '';
 			if(proxy_response.statusCode === 401 && (error_message.indexOf(global.const.INVALID_TOKEN) !== -1 || error_message.indexOf(global.const.EXPIRED_TOKEN) !== -1 || error_message.indexOf(global.const.UNVERIFIED_IDENTITY) !== -1)){
-        console.log(error_message);
 				// get refresh token for the invalid token
 				if(options.headers.Authorization){
 					var access_token = options.headers.Authorization.substr('Bearer '.length);
