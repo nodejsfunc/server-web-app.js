@@ -351,7 +351,7 @@ exports.getResults = function (req, res, options) {
 								_request(options, _parseResponse, _errorHandler, {
 									name: global.const.AUTH_ACCESS_TOKEN_NAME,
 									value: new_access_token,
-									prop: { expires: expiresDate, httpOnly: true, secure: true }
+									prop: { expires: expiresDate, path: '/api', httpOnly: true, secure: true }
 								});
 							}, function(){
 								// refresh token invalid, send back result as is
