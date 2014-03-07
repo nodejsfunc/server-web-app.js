@@ -48,6 +48,13 @@ exports.getResults = function (req, res, options) {
       }
     }
   }
+
+  // Add origin header if missing, as it's not set by Firefox/IE for same-domain requests,
+  // but required for the services API:
+  if (!headers.origin) {
+    headers.origin = req.protocol + ':' + req.headers.host;
+  }
+
   // if present, translate access_token cookie to OAuth2 Authorisation header with bearer token
   // NOTE: the node app may be communicating with services behind the same firewall or on a different domain entirely (as is the case with nodejs-internal)
   // so we don't want to add the OAUTH2 header if communicating on port 80
