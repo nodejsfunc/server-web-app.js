@@ -20,6 +20,8 @@ global.const = {
 	CLUBCARD_PATH: '/service/my/clubcards',
 	CLUBCARD_VALIDATION_PATH: '/service/clubcards/validation',
 	LIBRARY_PATH: '/service/my/library',
+	ADMIN_PATH: '/service/admin/users/',
+	ADMIN_CREDIT_PATH: 'credit',
 	EXPIRED_TOKEN: 'The access token expired',
 	INVALID_TOKEN: 'Access token is invalid',
   UNVERIFIED_IDENTITY: 'User identity must be reverified'
@@ -92,6 +94,10 @@ exports.getResults = function (req, res, options) {
 		return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.LIBRARY_PATH) === 0;
 	};
 
+	var _isAdminCreditService = function(){
+		return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.ADMIN_PATH) === 0 && options.path.indexOf(global.const.ADMIN_CREDIT_PATH) !== -1;
+	};
+
 	// the bodyparser of express.js is unable to parse anything other than JSON or form parameters (req.body is empty)
 	// to enable custom content-types, that send raw data, we must set the accept header to the desired content-type (set by the request in Accept)
 	// this app will replace the content type AFTER the bodyparser received the data in req.body
@@ -128,6 +134,10 @@ exports.getResults = function (req, res, options) {
   }
 
 	if(req.method !== 'GET' && req.headers.accept && _isLibraryService()){
+		_setContentType();
+	}
+
+	if(req.method !== 'GET' && req.headers.accept && _isAdminCreditService()){
 		_setContentType();
 	}
 
@@ -406,7 +416,7 @@ exports.getResults = function (req, res, options) {
 		proxy_request.abort();
   });
   if (req.method === 'POST'|| req.method === 'PATCH') {
-    proxy_request.write(proxy_request_body);
+		proxy_request.write(proxy_request_body);
   }
   proxy_request.end();
 };
