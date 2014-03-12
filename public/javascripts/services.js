@@ -4,6 +4,8 @@
 
 // constant variables
 global.const = {
+	// Version number to identify the data structure of token information stored in Redis:
+	TOKEN_STORAGE_VERSION : '1.0.0',
 	AUTH_ACCESS_TOKEN_NAME : 'access_token',
 	AUTH_REFRESH_TOKEN_NAME : 'refresh_token',
 	AUTH_PATH_COMPONENT : 'oauth2',
@@ -153,12 +155,15 @@ exports.getResults = function (req, res, options) {
   // Make the proxy HTTP request
 	var proxy_scheme = options.port === 443 ? https : http;
 
-	var _updateAccessToken = function(oldAT, newAT, value){
+	var _updateAccessToken = function(oldAT, newAT, obj){
+		// add semantic version number:
+		obj.version = global.const.TOKEN_STORAGE_VERSION;
+
 		// delete old access token, if it exists
 		global.repository.del(oldAT);
 
 		// set the access/refresh token in the key/value store
-		global.repository.set(newAT, value);
+		global.repository.set(newAT, JSON.stringify(obj));
 	};
 
 	/**
@@ -218,7 +223,7 @@ exports.getResults = function (req, res, options) {
               var expiresDate = req.param(global.const.AUTH_PARAM_REMEMBER_ME) === 'true' ? new Date(Date.now() + global.const.AUTH_MAX_AGE) : null;
               res.cookie(global.const.AUTH_ACCESS_TOKEN_NAME, access_token, { path: '/api', expires: expiresDate, httpOnly: true, secure: true });
 
-              _updateAccessToken(req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME], access_token, JSON.stringify({refresh_token:refresh_token, user_id: user_id, remember_me: expiresDate !== null}));
+              _updateAccessToken(req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME], access_token, {refresh_token:refresh_token, user_id: user_id, remember_me: expiresDate !== null});
             }
           }
           catch (e) {
@@ -360,7 +365,7 @@ exports.getResults = function (req, res, options) {
 								var expiresDate = remember_me ? new Date(Date.now() + global.const.AUTH_MAX_AGE) : null;
 
 								// save new access token
-								_updateAccessToken(access_token, new_access_token, JSON.stringify({refresh_token:refresh_token, user_id: user_id, remember_me: expiresDate !== null}));
+								_updateAccessToken(access_token, new_access_token, {refresh_token:refresh_token, user_id: user_id, remember_me: expiresDate !== null});
 
 								// update authorization
 								options.headers.Authorization = 'Bearer '+ new_access_token;
