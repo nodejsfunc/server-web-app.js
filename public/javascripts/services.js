@@ -279,6 +279,24 @@ exports.getResults = function (req, res, options) {
 		};
 	};
 
+  /**
+   * helper function for the _refreshToken and _userDataRequest functions
+   * @param refresh_token the refresh token to use to get a new AT
+   * @param onSuccess function to call on success
+   * @param onError function to call on error
+   * @private
+   */
+  var _refreshTokenRequest = function(refresh_token, onSuccess, onError){
+    var post_data = global.querystring.stringify({
+      refresh_token: refresh_token,
+      grant_type: global.const.AUTH_REFRESH_TOKEN_NAME
+    });
+    var post_req = _request(_refreshTokenOptions(post_data), onSuccess, onError);
+    post_req.write(post_data);
+    post_req.end();
+    return post_req;
+  };
+
 	/**
 	 * function that refreshes the access token (AT)
 	 * @param refresh_token the refresh token to use to get a new AT
@@ -287,12 +305,8 @@ exports.getResults = function (req, res, options) {
 	 * @private
 	 */
 	var _refreshToken = function(refresh_token, onSuccess, onError){
-		var post_data = global.querystring.stringify({
-			refresh_token: refresh_token,
-			grant_type: global.const.AUTH_REFRESH_TOKEN_NAME
-		});
 		var new_access_token = '';
-		var post_req = _request(_refreshTokenOptions(post_data), function(response){
+		_refreshTokenRequest(refresh_token, function(response){
 			if(response.statusCode === 200){
 				response.on('data', function (chunk) {
 					try{
@@ -319,8 +333,6 @@ exports.getResults = function (req, res, options) {
 				onError(error);
 			}
 		});
-		post_req.write(post_data);
-		post_req.end();
 	};
 
 	// generic error handler
@@ -337,6 +349,76 @@ exports.getResults = function (req, res, options) {
 		res.end();
 	};
 	// console.log(options, proxy_request_body, req.body);
+
+  /**
+   * timeout handler function for the proxy requests
+   * @param request object for the ongoing request
+   * @private
+   */
+  var _timeoutHandler = function (request) {
+    // set a timeout handler
+    req.socket.removeAllListeners('timeout');
+    req.socket.setTimeout(api_timeout * 1000);
+    req.socket.on('timeout', function () {
+      if(res.headersSent){
+        return;
+      }
+
+      // return 504 message
+      var message = '<html><head><title>504 Gateway Time-out</title></head>'+
+        '<body bgcolor="white">'+
+        '<center><h1>504 Gateway Time-out</h1></center>'+
+        '<hr>'+
+        '</body></html>';
+      res.send(504, message);
+      res.end();
+
+      // cancel any ongoing requests
+      request.abort();
+    });
+  };
+
+  /**
+   * This method retrieves user data with the stored refresh_token for the given access_token (from cookie header)
+   * It effectively allows to retrieve user data without critical evelated level,
+   * which is required for the /users/{id} API endpoint but not for the /oauth/token endpoint.
+   * @private
+   */
+  var _userDataRequest = function(){
+    var unauthorizedHandler = function () {
+      if(res.headersSent){
+        return;
+      }
+      res.send(401);
+      res.end();
+    };
+    if(options.headers.Authorization){
+      var access_token = options.headers.Authorization.substr('Bearer '.length);
+      global.repository.get(access_token).then(function(value){
+        try{
+          var obj = JSON.parse(value),
+            refresh_token = obj.refresh_token;
+          // retrieve user data from /oauth/token endpoint
+          var proxy_request = _refreshTokenRequest(refresh_token, _parseResponse, _errorHandler);
+          _timeoutHandler(proxy_request);
+        } catch(err) {
+          // refresh token not found
+          unauthorizedHandler();
+        }
+      }, function(){
+        // Redis error, don't expose to the client
+        unauthorizedHandler();
+      });
+    } else {
+      // Token does not exist on the client
+      unauthorizedHandler();
+    }
+  };
+
+	if (options.path === global.const.REFRESH_TOKEN_PATH && options.method === 'GET') {
+		return _userDataRequest();
+	}
+
 	// make request on behalf of the website
 	var proxy_request = _request(options,
 		// on success
@@ -400,26 +482,8 @@ exports.getResults = function (req, res, options) {
 		_errorHandler
 	);
 
-  // set a timeout handler
-  req.socket.removeAllListeners('timeout');
-  req.socket.setTimeout(api_timeout * 1000);
-  req.socket.on('timeout', function () {
-		if(res.headersSent){
-			return;
-		}
+  _timeoutHandler(proxy_request);
 
-		// return 504 message
-		var message = '<html><head><title>504 Gateway Time-out</title></head>'+
-			'<body bgcolor="white">'+
-			'<center><h1>504 Gateway Time-out</h1></center>'+
-			'<hr>'+
-		'</body></html>';
-		res.send(504, message);
-		res.end();
-
-		// cancel any ongoing requests
-		proxy_request.abort();
-  });
   if (req.method === 'POST'|| req.method === 'PATCH') {
 		proxy_request.write(proxy_request_body);
   }
