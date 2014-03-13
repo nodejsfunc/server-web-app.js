@@ -37,16 +37,17 @@ exports.index = function (req, res) {
       }
 
 			// if path is requesting user details, append user id to url
-			if(options.host === domains.auth.options.host &&
-				options.path === '/users'){
+			if(options.host === domains.auth.options.host && req.method === 'GET' &&
+          (options.path === '/users' || options.path.substr(0, 7) === '/users?')){
 				if(req.cookies.hasOwnProperty(global.const.AUTH_ACCESS_TOKEN_NAME)){
 					var token = req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME];
 					global.repository.get(token).then(function(value){ // on success
 						try{
 							var user_data = JSON.parse(value);
 							var user_id = user_data.user_id;
-							options.path += '/' + user_id;
-							if (user_data.version === '1.1.0') {
+							var noCache = options.path.indexOf('no-cache') !== -1;
+							options.path = '/users/' + user_id;
+							if (!noCache && user_data.version === '1.1.0') {
 							  // Return user data stored in Redis (workaround for /users/{id} requiring critical elevation):
 							  var responseBody = JSON.stringify({
 							    user_id: 'urn:blinkbox:zuul:user:' + user_id,
