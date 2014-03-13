@@ -213,6 +213,7 @@ exports.getResults = function (req, res, options) {
           try {
             var json_response = JSON.parse(response_body);
             if (json_response.hasOwnProperty(global.const.AUTH_ACCESS_TOKEN_NAME)) {
+              // response is a refresh token request to the /oauth/token endpoint
               var access_token = json_response[global.const.AUTH_ACCESS_TOKEN_NAME];
               var refresh_token = json_response[global.const.AUTH_REFRESH_TOKEN_NAME];
 
@@ -234,6 +235,7 @@ exports.getResults = function (req, res, options) {
                 remember_me: expiresDate !== null
               });
             } else if (json_response.hasOwnProperty('user_username')) {
+              // response is in reply to a PATCH request to the /users/{id} endpoint so we update the stored user data
               var access_token = req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME];
               global.repository.get(access_token).then(function(value){
                 try{
@@ -244,7 +246,7 @@ exports.getResults = function (req, res, options) {
                   // save updated user data (workaround for /users/{id} requiring critical elevation)
                   _updateAccessToken(access_token, access_token, obj);
                 } catch(ignore) {
-                  // refresh token not found
+                  // JSON parsing failed
                 }
               });
             }
@@ -412,7 +414,7 @@ exports.getResults = function (req, res, options) {
 								_parseResponse(proxy_response);
 							});
 						} catch(err) {
-							// refresh token not found, send back the result as is
+							// JSON parsing failed, refresh token not found, send back the result as is
 							_parseResponse(proxy_response);
 						}
 					}, function(){
