@@ -206,7 +206,8 @@ exports.getResults = function (req, res, options) {
       response_body += chunk;
       if (!chunked) {
         // If appropriate, translate the authentication OAuth2 bearer token back to a cookie
-        if (req.path.indexOf(global.const.AUTH_PATH_COMPONENT) !== -1  &&
+        // Also update user data if applicable (workaround for /users/{id} requiring critical elevation)
+        if ((req.path.indexOf(global.const.AUTH_PATH_COMPONENT) !== -1 || req.path.indexOf('/users/') !== -1) &&
           proxy_response.headers.hasOwnProperty('content-type') &&
           proxy_response.headers['content-type'].indexOf('application/json') === 0) {
           try {
@@ -231,6 +232,20 @@ exports.getResults = function (req, res, options) {
                 user_first_name: json_response.user_first_name,
                 user_last_name: json_response.user_last_name,
                 remember_me: expiresDate !== null
+              });
+            } else if (json_response.hasOwnProperty('user_username')) {
+              var access_token = req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME];
+              global.repository.get(access_token).then(function(value){
+                try{
+                  var obj = JSON.parse(value);
+                  obj.user_username = json_response.user_username;
+                  obj.user_first_name = json_response.user_first_name;
+                  obj.user_last_name = json_response.user_last_name;
+                  // save updated user data (workaround for /users/{id} requiring critical elevation)
+                  _updateAccessToken(access_token, access_token, obj);
+                } catch(ignore) {
+                  // refresh token not found
+                }
               });
             }
           }

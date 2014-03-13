@@ -46,7 +46,7 @@ exports.index = function (req, res) {
 							var user_data = JSON.parse(value);
 							var user_id = user_data.user_id;
 							options.path += '/' + user_id;
-							if (user_data.user_username) {
+							if (user_data.hasOwnProperty('user_username')) {
 							  // Return user data stored in Redis (workaround for /users/{id} requiring critical elevation):
 							  var responseBody = JSON.stringify({
 							    user_id: 'urn:blinkbox:zuul:user:' + user_id,
