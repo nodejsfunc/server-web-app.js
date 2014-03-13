@@ -212,9 +212,10 @@ exports.getResults = function (req, res, options) {
           proxy_response.headers['content-type'].indexOf('application/json') === 0) {
           try {
             var json_response = JSON.parse(response_body);
+            var access_token;
             if (json_response.hasOwnProperty(global.const.AUTH_ACCESS_TOKEN_NAME)) {
               // response is a refresh token request to the /oauth/token endpoint
-              var access_token = json_response[global.const.AUTH_ACCESS_TOKEN_NAME];
+              access_token = json_response[global.const.AUTH_ACCESS_TOKEN_NAME];
               var refresh_token = json_response[global.const.AUTH_REFRESH_TOKEN_NAME];
 
               // get the user id from the response
@@ -236,7 +237,7 @@ exports.getResults = function (req, res, options) {
               });
             } else if (json_response.hasOwnProperty('user_username')) {
               // response is in reply to a PATCH request to the /users/{id} endpoint so we update the stored user data
-              var access_token = req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME];
+              access_token = req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME];
               global.repository.get(access_token).then(function(value){
                 try{
                   var obj = JSON.parse(value);
