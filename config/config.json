@@ -9,8 +9,7 @@
       "universal": "UA-44875536-3",
       "domain": "nodejs-internal.mobcastdev.com"
     },
-		"nonSecureServicesDomain": "qa.mobcastdev.com",
-		"bugsenseKey": ""
+		"nonSecureServicesDomain": "qa.mobcastdev.com"
 	},
   "domains": {
     "service": {
