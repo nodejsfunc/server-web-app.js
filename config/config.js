@@ -6,6 +6,7 @@
 
 var merchant_arg = process.argv.indexOf('-merchantKey');
 var google_arg = process.argv.indexOf('-googleAnalyticsID');
+var bugsense_arg = process.argv.indexOf('-bugsenseKey');
 var config = require('../config/config.json');
 global.api_domains = config.domains;
 global.api_timeout = config.timeout || 10;
@@ -16,6 +17,7 @@ global.databasePort = config.databasePort;
 global.clientConfig = {
 	'merchantKey': merchant_arg !== -1 ? process.argv[merchant_arg + 1] : config.clientConfig.merchantKey,
 	'googleAnalyticsID': google_arg !== -1 ? process.argv[google_arg + 1] : config.clientConfig.googleAnalyticsID,
-	'nonSecureServicesDomain': config.clientConfig.nonSecureServicesDomain
+	'nonSecureServicesDomain': config.clientConfig.nonSecureServicesDomain,
+	'bugsenseKey': bugsense_arg !== -1 ? process.argv[bugsense_arg + 1] : config.clientConfig.bugsenseKey
 };
 
