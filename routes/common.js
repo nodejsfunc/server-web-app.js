@@ -43,10 +43,27 @@ exports.index = function (req, res) {
 					var token = req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME];
 					global.repository.get(token).then(function(value){ // on success
 						try{
-							var user_id = JSON.parse(value).user_id;
+							var user_data = JSON.parse(value);
+							var user_id = user_data.user_id;
 							options.path += '/' + user_id;
-							// make request with user id
-							require(global.servicesPath).getResults(req, res, options);
+							if (user_data.user_username) {
+							  // Return user data stored in Redis (workaround for /users/{id} requiring critical elevation):
+							  var responseBody = JSON.stringify({
+							    user_id: 'urn:blinkbox:zuul:user:' + user_id,
+							    user_uri: options.path,
+							    user_first_name: user_data.user_first_name,
+							    user_last_name: user_data.user_last_name,
+							    user_username: user_data.user_username
+							  });
+							  res.setHeader('X-Powered-By', global.app_name + global.app_version);
+							  res.setHeader('Content-Type', 'application/json');
+							  res.setHeader('Content-Length', responseBody.length);
+							  res.send(200, responseBody);
+							  res.end();
+							} else {
+							  // make request with user id
+							  require(global.servicesPath).getResults(req, res, options);
+							}
 						}catch(e){
 							// error retrieving valid data from redis database, continue original request
 							res.clearCookie(global.const.AUTH_ACCESS_TOKEN_NAME);

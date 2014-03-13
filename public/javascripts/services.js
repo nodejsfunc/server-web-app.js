@@ -5,7 +5,7 @@
 // constant variables
 global.const = {
 	// Version number to identify the data structure of token information stored in Redis:
-	TOKEN_STORAGE_VERSION : '1.0.0',
+	TOKEN_STORAGE_VERSION : '1.1.0',
 	AUTH_ACCESS_TOKEN_NAME : 'access_token',
 	AUTH_REFRESH_TOKEN_NAME : 'refresh_token',
 	AUTH_PATH_COMPONENT : 'oauth2',
@@ -223,7 +223,15 @@ exports.getResults = function (req, res, options) {
               var expiresDate = req.param(global.const.AUTH_PARAM_REMEMBER_ME) === 'true' ? new Date(Date.now() + global.const.AUTH_MAX_AGE) : null;
               res.cookie(global.const.AUTH_ACCESS_TOKEN_NAME, access_token, { path: '/api', expires: expiresDate, httpOnly: true, secure: true });
 
-              _updateAccessToken(req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME], access_token, {refresh_token:refresh_token, user_id: user_id, remember_me: expiresDate !== null});
+              // save new access token including user data (workaround for /users/{id} requiring critical elevation)
+              _updateAccessToken(req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME], access_token, {
+                refresh_token: refresh_token,
+                user_id: user_id,
+                user_username: json_response.user_username,
+                user_first_name: json_response.user_first_name,
+                user_last_name: json_response.user_last_name,
+                remember_me: expiresDate !== null
+              });
             }
           }
           catch (e) {
@@ -291,22 +299,21 @@ exports.getResults = function (req, res, options) {
 			refresh_token: refresh_token,
 			grant_type: global.const.AUTH_REFRESH_TOKEN_NAME
 		});
-		var new_access_token = '';
+		var obj;
 		var post_req = _request(_refreshTokenOptions(post_data), function(response){
 			if(response.statusCode === 200){
 				response.on('data', function (chunk) {
 					try{
-						chunk = JSON.parse(chunk + '');
+						obj = JSON.parse(chunk + '');
 					} catch(err){
 						if(typeof onError === 'function'){
 							onError('Invalid JSON when attempting to parse response body for refresh token');
 						}
 					}
-					new_access_token = chunk && chunk.access_token ? chunk.access_token : '';
 				});
 				response.on('end', function() {
 					if(typeof onSuccess === 'function'){
-						onSuccess(new_access_token);
+						onSuccess(obj);
 					}
 				});
 			} else {
@@ -360,12 +367,21 @@ exports.getResults = function (req, res, options) {
 								remember_me = !!obj.remember_me, // convert remember_me to its boolean value
 								user_id = obj.user_id;
 							// get new access token
-							_refreshToken(refresh_token, function(new_access_token){
+							_refreshToken(refresh_token, function(result){
+								var new_access_token = result.access_token;
+
 								// set expiry date
 								var expiresDate = remember_me ? new Date(Date.now() + global.const.AUTH_MAX_AGE) : null;
 
-								// save new access token
-								_updateAccessToken(access_token, new_access_token, {refresh_token:refresh_token, user_id: user_id, remember_me: expiresDate !== null});
+								// save new access token including user data (workaround for /users/{id} requiring critical elevation)
+								_updateAccessToken(access_token, new_access_token, {
+									refresh_token: refresh_token,
+									user_id: user_id,
+									user_username: result.user_username,
+									user_first_name: result.user_first_name,
+									user_last_name: result.user_last_name,
+									remember_me: expiresDate !== null
+								});
 
 								// update authorization
 								options.headers.Authorization = 'Bearer '+ new_access_token;
