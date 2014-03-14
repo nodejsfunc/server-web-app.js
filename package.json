@@ -2,7 +2,7 @@
   "name": "BlinkNode",
   "version": "1.0.0-0",
   "dependencies": {
-    "express": "3.4.5",
+    "express": "3.4.6",
     "jade": "0.35.0",
 		"redis": "0.9.1"
   },
