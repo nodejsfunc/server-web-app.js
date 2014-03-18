@@ -46,26 +46,29 @@ exports.index = function (req, res) {
 							var user_data = JSON.parse(value);
 							var user_id = user_data.user_id;
 							var noCache = options.path.indexOf('no-cache') !== -1;
-							options.path = '/users/' + user_id;
-							if (!noCache && user_data.version === '1.1.0') {
-							  // Return user data stored in Redis (workaround for /users/{id} requiring critical elevation):
-							  var responseBody = JSON.stringify({
-							    user_id: 'urn:blinkbox:zuul:user:' + user_id,
-							    user_uri: options.path,
-							    user_first_name: user_data.user_first_name,
-							    user_last_name: user_data.user_last_name,
-							    user_username: user_data.user_username
+              var post_data;
+							if (!noCache) {
+							  post_data = global.querystring.stringify({
+							    refresh_token: user_data.refresh_token,
+							    grant_type: global.const.AUTH_REFRESH_TOKEN_NAME
 							  });
-							  res.setHeader('X-Powered-By', global.app_name + global.app_version);
-							  res.setHeader('Content-Type', 'application/json');
-							  res.setHeader('Cache-Control', 'no-store');
-							  res.setHeader('Pragma', 'no-cache');
-							  res.send(200, responseBody);
-							  res.end();
+							  // Return user data from /oauth/token endpoint (workaround for /users/{id} requiring critical elevation):
+							  options = {
+							    host: global.api_domains.auth.options.host,
+							    path: global.const.REFRESH_TOKEN_PATH,
+							    port: global.api_domains.auth.options.port,
+							    method: 'POST',
+							    headers: {
+							      'Content-Type': 'application/x-www-form-urlencoded',
+							      'Content-Length': post_data.length
+							    }
+							  };
+							  req.method = 'POST';
 							} else {
 							  // make request with user id
-							  require(global.servicesPath).getResults(req, res, options);
+							  options.path = '/users/' + user_id;
 							}
+							require(global.servicesPath).getResults(req, res, options, post_data);
 						}catch(e){
 							// error retrieving valid data from redis database, continue original request
 							res.clearCookie(global.const.AUTH_ACCESS_TOKEN_NAME);

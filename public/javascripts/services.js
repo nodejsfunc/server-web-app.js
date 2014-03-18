@@ -5,7 +5,7 @@
 // constant variables
 global.const = {
 	// Version number to identify the data structure of token information stored in Redis:
-	TOKEN_STORAGE_VERSION : '1.1.0',
+	TOKEN_STORAGE_VERSION : '2.0.0',
 	AUTH_ACCESS_TOKEN_NAME : 'access_token',
 	AUTH_REFRESH_TOKEN_NAME : 'refresh_token',
 	AUTH_PATH_COMPONENT : 'oauth2',
@@ -36,121 +36,127 @@ global.const = {
  * Time: 12:08
  * To change this template use File | Settings | File Templates.
  */
-exports.getResults = function (req, res, options) {
+exports.getResults = function (req, res, options, request_body) {
 
-  var proxy_request_body;
+  console.log(options);
 
-  // Build proxy request headers by copying across request headers from client request
-  var headers = {};
-  for(var header in req.headers) {
-    if (req.headers.hasOwnProperty(header)) {
-      if (!options.hasOwnProperty(header)) {
-        if (header !== 'cookie') {   // don't copy across cookies
-          headers[header] = req.headers[header];
-        //  console.log(header+' '+req.headers[header]); // uncomment to debug request headers
+  var proxy_request_body = request_body;
+
+  if (!proxy_request_body) {
+
+    // Build proxy request headers by copying across request headers from client request
+    var headers = {};
+    for(var header in req.headers) {
+      if (req.headers.hasOwnProperty(header)) {
+        if (!options.hasOwnProperty(header)) {
+          if (header !== 'cookie') {   // don't copy across cookies
+            headers[header] = req.headers[header];
+          //  console.log(header+' '+req.headers[header]); // uncomment to debug request headers
+          }
         }
       }
     }
+
+    // Add origin header if missing, as it's not set by Firefox/IE for same-domain requests,
+    // but required for the services API:
+    if (!headers.origin) {
+      headers.origin = req.protocol + '://' + req.headers.host;
+    }
+
+    // if present, translate access_token cookie to OAuth2 Authorisation header with bearer token
+    // NOTE: the node app may be communicating with services behind the same firewall or on a different domain entirely (as is the case with nodejs-internal)
+    // so we don't want to add the OAUTH2 header if communicating on port 80
+    if (req.cookies.hasOwnProperty(global.const.AUTH_ACCESS_TOKEN_NAME) && options.port !== 80) {
+      headers.Authorization = 'Bearer '+ req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME];
+    }
+    // console.log('COOKIES:'+JSON.stringify(req.cookies)); // uncomment to see cookies in client requset
+
+    if (req.method === 'POST' || req.method === 'PATCH') {
+      proxy_request_body = querystring.stringify(req.body);
+      headers['content-length'] = proxy_request_body.length;
+    }
+
+    var _isCreditCardService = function(){
+      return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.CREDIT_CARD_PATH) === 0;
+    };
+
+    var _isBasketService = function(){
+      return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.BASKET_PATH) === 0;
+    };
+
+    var _isPurchaseService = function(){
+      return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.PURCHASE_PATH) === 0;
+    };
+
+    var _isClubcardService = function(){
+      return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.CLUBCARD_PATH) === 0;
+    };
+
+    var _isClubcardValidationService = function(){
+      return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.CLUBCARD_VALIDATION_PATH) === 0;
+    };
+
+    var _isLibraryService = function(){
+      return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.LIBRARY_PATH) === 0;
+    };
+
+    var _isAdminCreditService = function(){
+      return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.ADMIN_PATH) === 0 && options.path.indexOf(global.const.ADMIN_CREDIT_PATH) !== -1;
+    };
+
+    // the bodyparser of express.js is unable to parse anything other than JSON or form parameters (req.body is empty)
+    // to enable custom content-types, that send raw data, we must set the accept header to the desired content-type (set by the request in Accept)
+    // this app will replace the content type AFTER the bodyparser received the data in req.body
+    // this is only required for POST/PATCH/DELETE
+
+    var _setContentType = function(){
+      // change the content type
+      headers['content-type'] = req.headers.accept;
+      // send data as JSON string, not query string as the default
+      proxy_request_body = JSON.stringify(req.body);
+      if(req.method === 'PATCH' || req.method === 'POST'){
+        headers['content-length'] = proxy_request_body.length;
+      }
+    };
+
+    if(req.method !== 'GET' && req.headers.accept && _isCreditCardService()){
+      _setContentType();
+    }
+
+    if(req.method !== 'GET' && req.headers.accept && _isBasketService()){
+      _setContentType();
+    }
+
+    if(req.method !== 'GET' && req.headers.accept && _isPurchaseService()){
+      _setContentType();
+    }
+
+    if(req.method !== 'GET' && req.headers.accept && _isClubcardService()){
+      _setContentType();
+    }
+
+    if(req.method !== 'GET' && req.headers.accept && _isClubcardValidationService()){
+      _setContentType();
+    }
+
+    if(req.method !== 'GET' && req.headers.accept && _isLibraryService()){
+      _setContentType();
+    }
+
+    if(req.method !== 'GET' && req.headers.accept && _isAdminCreditService()){
+      _setContentType();
+    }
+
+    options.headers = headers;
+    options.method = req.method; // make the proxy request use the same verb as the client request
+
+    // TODO For testing purposes
+    // options.port = 443;
+    // options.host = 'auth.mobcastdev.com';
+    // options.path = '/users/532';
+    // options.headers.Authorization = 'Bearer ' + 'invalid';
+
   }
-
-  // Add origin header if missing, as it's not set by Firefox/IE for same-domain requests,
-  // but required for the services API:
-  if (!headers.origin) {
-    headers.origin = req.protocol + ':' + req.headers.host;
-  }
-
-  // if present, translate access_token cookie to OAuth2 Authorisation header with bearer token
-  // NOTE: the node app may be communicating with services behind the same firewall or on a different domain entirely (as is the case with nodejs-internal)
-  // so we don't want to add the OAUTH2 header if communicating on port 80
-  if (req.cookies.hasOwnProperty(global.const.AUTH_ACCESS_TOKEN_NAME) && options.port !== 80) {
-		headers.Authorization = 'Bearer '+ req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME];
-  }
-	// console.log('COOKIES:'+JSON.stringify(req.cookies)); // uncomment to see cookies in client requset
-
-  if (req.method === 'POST' || req.method === 'PATCH') {
-		proxy_request_body = querystring.stringify(req.body);
-		headers['content-length'] = proxy_request_body.length;
-  }
-
-	var _isCreditCardService = function(){
-		return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.CREDIT_CARD_PATH) === 0;
-	};
-
-	var _isBasketService = function(){
-		return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.BASKET_PATH) === 0;
-	};
-
-	var _isPurchaseService = function(){
-		return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.PURCHASE_PATH) === 0;
-	};
-
-	var _isClubcardService = function(){
-		return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.CLUBCARD_PATH) === 0;
-	};
-
-  var _isClubcardValidationService = function(){
-    return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.CLUBCARD_VALIDATION_PATH) === 0;
-  };
-
-	var _isLibraryService = function(){
-		return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.LIBRARY_PATH) === 0;
-	};
-
-	var _isAdminCreditService = function(){
-		return options.host === global.api_domains['secure-service'].options.host && options.path.indexOf(global.const.ADMIN_PATH) === 0 && options.path.indexOf(global.const.ADMIN_CREDIT_PATH) !== -1;
-	};
-
-	// the bodyparser of express.js is unable to parse anything other than JSON or form parameters (req.body is empty)
-	// to enable custom content-types, that send raw data, we must set the accept header to the desired content-type (set by the request in Accept)
-	// this app will replace the content type AFTER the bodyparser received the data in req.body
-	// this is only required for POST/PATCH/DELETE
-
-	var _setContentType = function(){
-		// change the content type
-		headers['content-type'] = req.headers.accept;
-		// send data as JSON string, not query string as the default
-		proxy_request_body = JSON.stringify(req.body);
-		if(req.method === 'PATCH' || req.method === 'POST'){
-			headers['content-length'] = proxy_request_body.length;
-		}
-	};
-
-	if(req.method !== 'GET' && req.headers.accept && _isCreditCardService()){
-		_setContentType();
-	}
-
-	if(req.method !== 'GET' && req.headers.accept && _isBasketService()){
-		_setContentType();
-	}
-
-	if(req.method !== 'GET' && req.headers.accept && _isPurchaseService()){
-		_setContentType();
-	}
-
-	if(req.method !== 'GET' && req.headers.accept && _isClubcardService()){
-		_setContentType();
-	}
-
-  if(req.method !== 'GET' && req.headers.accept && _isClubcardValidationService()){
-    _setContentType();
-  }
-
-	if(req.method !== 'GET' && req.headers.accept && _isLibraryService()){
-		_setContentType();
-	}
-
-	if(req.method !== 'GET' && req.headers.accept && _isAdminCreditService()){
-		_setContentType();
-	}
-
-	options.headers = headers;
-  options.method = req.method; // make the proxy request use the same verb as the client request
-
-	// TODO For testing purposes
-	// options.port = 443;
-	// options.host = 'auth.mobcastdev.com';
-	// options.path = '/users/532';
-	// options.headers.Authorization = 'Bearer ' + 'invalid';
 
   // Make the proxy HTTP request
 	var proxy_scheme = options.port === 443 ? https : http;
@@ -206,8 +212,7 @@ exports.getResults = function (req, res, options) {
       response_body += chunk;
       if (!chunked) {
         // If appropriate, translate the authentication OAuth2 bearer token back to a cookie
-        // Also update user data if applicable (workaround for /users/{id} requiring critical elevation)
-        if ((req.path.indexOf(global.const.AUTH_PATH_COMPONENT) !== -1 || req.path.indexOf('/users/') !== -1) &&
+        if (req.path.indexOf(global.const.AUTH_PATH_COMPONENT) !== -1 &&
           proxy_response.headers.hasOwnProperty('content-type') &&
           proxy_response.headers['content-type'].indexOf('application/json') === 0) {
           try {
@@ -226,29 +231,11 @@ exports.getResults = function (req, res, options) {
               var expiresDate = req.param(global.const.AUTH_PARAM_REMEMBER_ME) === 'true' ? new Date(Date.now() + global.const.AUTH_MAX_AGE) : null;
               res.cookie(global.const.AUTH_ACCESS_TOKEN_NAME, access_token, { path: '/api', expires: expiresDate, httpOnly: true, secure: true });
 
-              // save new access token including user data (workaround for /users/{id} requiring critical elevation)
+              // save new access token
               _updateAccessToken(req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME], access_token, {
                 refresh_token: refresh_token,
                 user_id: user_id,
-                user_username: json_response.user_username,
-                user_first_name: json_response.user_first_name,
-                user_last_name: json_response.user_last_name,
                 remember_me: expiresDate !== null
-              });
-            } else if (json_response.hasOwnProperty('user_username')) {
-              // response is in reply to a PATCH request to the /users/{id} endpoint so we update the stored user data
-              access_token = req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME];
-              global.repository.get(access_token).then(function(value){
-                try{
-                  var obj = JSON.parse(value);
-                  obj.user_username = json_response.user_username;
-                  obj.user_first_name = json_response.user_first_name;
-                  obj.user_last_name = json_response.user_last_name;
-                  // save updated user data (workaround for /users/{id} requiring critical elevation)
-                  _updateAccessToken(access_token, access_token, obj);
-                } catch(ignore) {
-                  // JSON parsing failed
-                }
               });
             }
           }
@@ -391,13 +378,10 @@ exports.getResults = function (req, res, options) {
 								// set expiry date
 								var expiresDate = remember_me ? new Date(Date.now() + global.const.AUTH_MAX_AGE) : null;
 
-								// save new access token including user data (workaround for /users/{id} requiring critical elevation)
+								// save new access token
 								_updateAccessToken(access_token, new_access_token, {
 									refresh_token: refresh_token,
 									user_id: user_id,
-									user_username: result.user_username,
-									user_first_name: result.user_first_name,
-									user_last_name: result.user_last_name,
 									remember_me: expiresDate !== null
 								});
 
