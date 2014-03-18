@@ -38,8 +38,6 @@ global.const = {
  */
 exports.getResults = function (req, res, options, request_body) {
 
-  console.log(options);
-
   var proxy_request_body = request_body;
 
   if (!proxy_request_body) {
