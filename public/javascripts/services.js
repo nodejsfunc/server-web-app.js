@@ -357,7 +357,6 @@ exports.getResults = function (req, res, options) {
 		var response = JSON.stringify(msg);
 		console.log('error', msg); //uncomment to see error message
 		res.set('Content-Type', 'application/json');
-		res.set('Content-length', response.length);
 		res.send(500, response);
 		res.end();
 	};
