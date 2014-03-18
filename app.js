@@ -3,6 +3,11 @@
 /* globals global */
 
 /**
+ *  New relic module
+ */
+require('newrelic');
+
+/**
  * Module dependencies.
  */
 var express = require('express'),
