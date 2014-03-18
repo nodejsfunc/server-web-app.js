@@ -58,6 +58,7 @@ exports.index = function (req, res) {
 							  });
 							  res.setHeader('X-Powered-By', global.app_name + global.app_version);
 							  res.setHeader('Content-Type', 'application/json');
+							  res.setHeader('Content-Length', responseBody.length);
 							  res.send(200, responseBody);
 							  res.end();
 							} else {
