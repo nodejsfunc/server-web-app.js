@@ -12,6 +12,7 @@ global.api_domains = config.domains;
 global.api_timeout = config.timeout || 10;
 global.databaseDomain = config.databaseDomain;
 global.databasePort = config.databasePort;
+global.newRelicKey = config.newRelicKey || '';
 
 // Override the client config if defined in the command line parameters
 global.clientConfig = {

@@ -29,6 +29,13 @@ var app = express();
 require('./config/config.js');
 
 /**
+ *  New relic module (load it only if we are in production)
+ */
+if (global.newRelicKey !== '') {
+  require('newrelic');
+}
+
+/**
  * App specific values (package.json)
  */
 var package_json = require('./package.json');
