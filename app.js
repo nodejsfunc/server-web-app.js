@@ -3,11 +3,6 @@
 /* globals global */
 
 /**
- *  New relic module
- */
-require('newrelic');
-
-/**
  * Module dependencies.
  */
 var express = require('express'),
@@ -32,6 +27,11 @@ var app = express();
  * Environment config specific variables
  */
 require('./config/config.js');
+
+/**
+ *  New relic module
+ */
+require('newrelic');
 
 /**
  * App specific values (package.json)
