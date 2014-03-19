@@ -12,8 +12,7 @@ exports.config = {
   /**
    * Your New Relic license key.
    */
-  license_key : 'fa8b449f23e5c207f42aa98e941df267365f1c52',
-  agent_enabled: (global.clientConfig.nonSecureServicesDomain === 'api.blinkboxbooks.com'), // Set up the agent only if we are in production
+  license_key : global.newRelicKey,
   logging : {
     /**
      * Level at which to log. 'trace' is most useful to New Relic when diagnosing
