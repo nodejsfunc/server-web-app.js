@@ -1,8 +1,10 @@
 'use strict';
 
 module.exports = function (grunt) {
-  // load all grunt tasks
-  require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+
+  // load grunt tasks on demand
+  require('jit-grunt')(grunt);
+
   grunt.initConfig({
     clean: {
       dist: {
@@ -40,7 +42,9 @@ module.exports = function (grunt) {
             'public/**/*',
             'routes/**/*',
             'views/**/*',
-            'node_modules/**/*'
+            'node_modules/**/*',
+            '!node_modules/grunt*/**',
+            '!node_modules/jit-grunt/**'
           ]
         }]
       }
@@ -70,7 +74,9 @@ module.exports = function (grunt) {
     'replace',
     'copy'
   ]);
+
   grunt.registerTask('default', ['build']);
+
   grunt.registerTask('create-version', function() {
     var pkg = grunt.file.readJSON('package.json');
     var searchTerm = pkg.version.substring(pkg.version.lastIndexOf('-') + 1, pkg.version.length);
@@ -78,4 +84,5 @@ module.exports = function (grunt) {
     grunt.config.set('serverVersion', fullVersion);
     grunt.config.set('searchTerm', searchTerm);
   });
+
 };
