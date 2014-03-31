@@ -6,6 +6,8 @@ module.exports = function (grunt) {
   require('jit-grunt')(grunt);
 
   grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
+
     clean: {
       dist: {
         files: [{
@@ -49,17 +51,9 @@ module.exports = function (grunt) {
         }]
       }
     },
-    replace: {
+    'update-version': {
       dist: {
-        options: {
-          variables: {
-            '<%= grunt.config.get("searchTerm") %>': '<%= grunt.config.get("serverVersion") %>'
-          },
-          prefix: '-'
-        },
-        files: [
-          {expand: true, flatten: true, src: ['package.json'], dest: ''}
-        ]
+        src: 'dist/package.json'
       }
     }
   });
@@ -71,18 +65,31 @@ module.exports = function (grunt) {
   grunt.registerTask('ci-build', [
     'clean:dist',
     'jshint',
-    'replace',
-    'copy'
+    'copy',
+    'update-version'
   ]);
 
   grunt.registerTask('default', ['build']);
 
   grunt.registerTask('create-version', function() {
-    var pkg = grunt.file.readJSON('package.json');
-    var searchTerm = pkg.version.substring(pkg.version.lastIndexOf('-') + 1, pkg.version.length);
-    var fullVersion = '-' + process.env.BUILD_NUMBER; // append Jenkins build number
-    grunt.config.set('serverVersion', fullVersion);
-    grunt.config.set('searchTerm', searchTerm);
+    var buildNumber = process.env.BUILD_NUMBER, // Jenkins build number
+        newVersion;
+    if (buildNumber) {
+      newVersion = grunt.config.get('pkg.version').split('-')[0] + '-' + buildNumber;
+      grunt.config.set('pkg.version', newVersion);
+    }
+  });
+
+  grunt.registerMultiTask('update-version', function () {
+    this.filesSrc.forEach(function (file) {
+      var pkg = grunt.file.readJSON(file);
+      pkg.version = grunt.config.get('pkg.version');
+      grunt.file.write(
+        file,
+        JSON.stringify(pkg, null, 2) + '\n'
+      );
+      grunt.log.writeln('Updated ' + file.cyan + ' version to ' + pkg.version);
+    });
   });
 
 };
