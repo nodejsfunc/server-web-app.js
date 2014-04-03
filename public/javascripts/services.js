@@ -9,6 +9,7 @@ global.const = {
 	AUTH_ACCESS_TOKEN_NAME : 'access_token',
 	AUTH_REFRESH_TOKEN_NAME : 'refresh_token',
 	AUTH_PATH_COMPONENT : 'oauth2',
+	AUTH_USERS_PATH : '/auth/users',
 	AUTH_PARAM_REMEMBER_ME : 'remember_me',
 	BBB_CONTENT_TYPE : 'application/vnd.blinkboxbooks.data',
 	AUTH_MAX_AGE : 1000*60*60*24*14, // 14 days
@@ -210,7 +211,7 @@ exports.getResults = function (req, res, options, request_body) {
       response_body += chunk;
       if (!chunked) {
         // If appropriate, translate the authentication OAuth2 bearer token back to a cookie
-        if (req.path.indexOf(global.const.AUTH_PATH_COMPONENT) !== -1 &&
+        if ((req.path.indexOf(global.const.AUTH_PATH_COMPONENT) !== -1 || req.path.indexOf(global.const.AUTH_USERS_PATH) !== -1) &&
           proxy_response.headers.hasOwnProperty('content-type') &&
           proxy_response.headers['content-type'].indexOf('application/json') === 0) {
           try {
@@ -235,6 +236,12 @@ exports.getResults = function (req, res, options, request_body) {
                 user_id: user_id,
                 remember_me: expiresDate !== null
               });
+
+              // Strip the access and refresh tokens from the response body:
+              delete json_response[global.const.AUTH_REFRESH_TOKEN_NAME];
+              delete json_response[global.const.AUTH_ACCESS_TOKEN_NAME];
+              chunk = JSON.stringify(json_response);
+              res.setHeader('Content-Length', chunk.length);
             }
           }
           catch (e) {
