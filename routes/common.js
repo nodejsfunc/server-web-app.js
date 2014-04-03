@@ -12,6 +12,16 @@
  */
 exports.index = function (req, res) {
 
+
+  // Require this header as a CSRF prevention measurement.
+  // For more information see
+  // https://tools.mobcastdev.com/jira/browse/CWA-1305
+  if (req.headers['x-requested-by'] !== 'blinkbox') {
+    res.send(403);
+    res.end();
+    return;
+  }
+
   // Purpose: given an alias in the URI, map requests to the appropriate domain
   // All requests will start with /api followed by an alias for the domain 
   // The aliases are defined in the environment config file in the /configs directory
