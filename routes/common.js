@@ -73,11 +73,13 @@ exports.index = function (req, res) {
 							// error retrieving valid data from redis database, continue original request
 							res.clearCookie(global.const.AUTH_ACCESS_TOKEN_NAME);
 							require(global.servicesPath).getResults(req, res, options);
+              global.bugsense.logError(e);
 						}
-					}, function(){ // on error
+					}, function(e){ // on error
 						// error connecting to redis, continue request
 						res.clearCookie(global.const.AUTH_ACCESS_TOKEN_NAME);
 						require(global.servicesPath).getResults(req, res, options);
+            global.bugsense.logError(e);
 					});
 				} else {
 					// no access token available

@@ -2,7 +2,8 @@
 
 var redis = require('redis').createClient(global.databasePort, global.databaseDomain);
 redis.on('error', function redisError(error){
-	console.log('\u001b[31m', 'Redis error --> ', error, '\u001b[0m');
+	console.log('\u001b[31m', 'Redis error --> ', error.toString(), '\u001b[0m');
+  global.bugsense.logError({message:'Redis error: '+error.toString(), stack: 'at repository.js', type:'RedisError'});
 });
 
 global.repository = {
@@ -12,6 +13,7 @@ global.repository = {
 			redis.set(key, value, 'PX', global.const.AUTH_MAX_AGE);
 		} else {
 			console.log('Error options for redis SET', key, '-', value);
+      global.bugsense.logError({message:'Error options for redis SET'+ key+ '-'+ value, stack: 'at repository.js', type:'RedisError'});
 		}
 	},
 	get: function(key){

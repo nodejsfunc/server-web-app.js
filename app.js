@@ -17,6 +17,7 @@ var express = require('express'),
 global.http = http;
 global.https = https;
 global.querystring = querystring;
+
 // Paths
 global.servicesPath = __dirname + '/public/javascripts/services.js';
 global.repositoryPath = __dirname + '/public/javascripts/repository.js';
@@ -34,6 +35,12 @@ require('./config/config.js');
 if (global.newRelicKey !== '') {
   require('newrelic');
 }
+
+/**
+ * Bugsense configuration
+ *
+ */
+global.bugsense = require('node-bugsense').setAPIKey(global.clientConfig.bugsenseKey);
 
 /**
  * App specific values (package.json)
@@ -77,8 +84,10 @@ app.use(function(err, req, res){
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Content-Length', response.length);
   res.send(500, JSON.stringify(response));
+  if(err !== undefined && err !== null) {
+    global.bugsense.logError(err);
+  }
 });
-
 
 /**
  * Includes

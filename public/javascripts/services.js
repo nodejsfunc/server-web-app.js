@@ -239,6 +239,7 @@ exports.getResults = function (req, res, options, request_body) {
           }
           catch (e) {
             console.log('Invalid JSON when attempting to parse response body for auth token');
+            global.bugsense.logError('Invalid JSON when attempting to parse response body for auth token');
           }
         }
       }
@@ -311,7 +312,9 @@ exports.getResults = function (req, res, options, request_body) {
 					} catch(err){
 						if(typeof onError === 'function'){
 							onError('Invalid JSON when attempting to parse response body for refresh token');
-						}
+						} else {
+              global.bugsense.logError(err);
+            }
 					}
 				});
 				response.on('end', function() {
@@ -341,6 +344,7 @@ exports.getResults = function (req, res, options, request_body) {
 		var msg = { error: e.message.replace(/\"/g, '') };      // strip any double quotes TODO: should handle single quotes too
 		var response = JSON.stringify(msg);
 		console.log('error', msg); //uncomment to see error message
+    global.bugsense.logError(e);
 		res.set('Content-Type', 'application/json');
 		res.set('Content-length', response.length);
 		res.send(500, response);
@@ -392,17 +396,23 @@ exports.getResults = function (req, res, options, request_body) {
 									value: new_access_token,
 									prop: { expires: expiresDate, path: '/api', httpOnly: true, secure: true }
 								});
-							}, function(){
+							}, function(err_message){
+                if(typeof err_message !== 'object' && err_message !== null) {
+                  err_message = {error:err_message, stack: 'at _refreshToken in services.js', type:'SyntaxError'};
+                }
+                global.bugsense.logError(err_message);
 								// refresh token invalid, send back result as is
 								_parseResponse(proxy_response);
 							});
 						} catch(err) {
+              global.bugsense.logError(err);
 							// JSON parsing failed, refresh token not found, send back the result as is
 							_parseResponse(proxy_response);
 						}
-					}, function(){
+					}, function(redis_error){
 						// Redis error, continue with response
 						_parseResponse(proxy_response);
+            global.bugsense.logError(redis_error);
 					});
 				} else {
 					// Token does not exist on the client, sending the response back as is
