@@ -40,7 +40,15 @@ if (global.newRelicKey !== '') {
  * Bugsense configuration
  *
  */
-global.bugsense = require('node-bugsense').setAPIKey(global.clientConfig.bugsenseKey);
+global.bugsense = require('node-bugsense');
+if (global.bugsenseKey) {
+  global.bugsense.setAPIKey(global.bugsenseKey);
+
+  //catch all errors in the application
+  process.on('uncaughtException', function (error) {
+    global.bugsense.logError(error);
+  });
+}
 
 /**
  * App specific values (package.json)
@@ -84,9 +92,6 @@ app.use(function(err, req, res){
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Content-Length', response.length);
   res.send(500, JSON.stringify(response));
-  if(err !== undefined && err !== null) {
-    global.bugsense.logError(err);
-  }
 });
 
 /**

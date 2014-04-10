@@ -24,5 +24,4 @@ global.clientConfig = {
 
 // bugsense api key is hard-coded for live, until ops adds the command line param
 global.clientConfig.bugsenseKey = !global.clientConfig.bugsenseKey && global.clientConfig.nonSecureServicesDomain === 'api.blinkboxbooks.com' ? '9fa7c727' : config.clientConfig.bugsenseKey;
-
-
+global.bugsenseKey =  global.clientConfig.nonSecureServicesDomain === 'api.blinkboxbooks.com'? '649f61e5': '';
