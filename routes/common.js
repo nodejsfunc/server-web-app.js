@@ -70,7 +70,7 @@ exports.index = function (req, res) {
 							    method: 'POST',
 							    headers: {
 							      'Content-Type': 'application/x-www-form-urlencoded',
-							      'Content-Length': Buffer.byteLength(post_data.length)
+							      'Content-Length': Buffer.byteLength(post_data)
 							    }
 							  };
 							  req.method = 'POST';
