@@ -66,7 +66,7 @@ app.use(function(req, res){
   var response = JSON.stringify({ code: 404, error: '404 Not found' });
   res.setHeader('X-Powered-By', global.app_name + global.app_version);
   res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Content-Length', Buffer.byteLength(response.length));
+  res.setHeader('Content-Length', Buffer.byteLength(response));
   res.send(404, response);
 });
 
@@ -75,7 +75,7 @@ app.use(function(err, req, res){
   var response = JSON.stringify({ code: 500, error: '500 Oh oh! something broke!' });
   res.setHeader('X-Powered-By', global.app_name + global.app_version);
   res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Content-Length', Buffer.byteLength(response.length));
+  res.setHeader('Content-Length', Buffer.byteLength(response));
   res.send(500, response);
 });
 
