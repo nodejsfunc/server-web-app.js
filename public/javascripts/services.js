@@ -38,7 +38,6 @@ global.const = {
  * To change this template use File | Settings | File Templates.
  */
 exports.getResults = function (req, res, options, request_body) {
-
   try {
     var proxy_request_body = request_body;
 
@@ -73,7 +72,7 @@ exports.getResults = function (req, res, options, request_body) {
 
       if (req.method === 'POST' || req.method === 'PATCH') {
         proxy_request_body = querystring.stringify(req.body);
-        headers['content-length'] = proxy_request_body.length;
+        headers['content-length'] = Buffer.byteLength(proxy_request_body);
       }
 
       var _isCreditCardService = function(){
@@ -115,7 +114,7 @@ exports.getResults = function (req, res, options, request_body) {
         // send data as JSON string, not query string as the default
         proxy_request_body = JSON.stringify(req.body);
         if(req.method === 'PATCH' || req.method === 'POST'){
-          headers['content-length'] = proxy_request_body.length;
+          headers['content-length'] = Buffer.byteLength(proxy_request_body);
         }
       };
 
@@ -242,7 +241,7 @@ exports.getResults = function (req, res, options, request_body) {
                 delete json_response[global.const.AUTH_REFRESH_TOKEN_NAME];
                 delete json_response[global.const.AUTH_ACCESS_TOKEN_NAME];
                 chunk = JSON.stringify(json_response);
-                res.setHeader('Content-Length', chunk.length);
+                res.setHeader('Content-Length', Buffer.byteLength(chunk));
               }
             }
             catch (e) {
@@ -293,7 +292,7 @@ exports.getResults = function (req, res, options, request_body) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Content-Length': post_data.length
+          'Content-Length': Buffer.byteLength(post_data)
         }
       };
     };
@@ -350,7 +349,7 @@ exports.getResults = function (req, res, options, request_body) {
       var response = JSON.stringify(msg);
       console.log('error', msg); //uncomment to see error message
       res.set('Content-Type', 'application/json');
-      res.set('Content-length', response.length);
+      res.set('Content-length', Buffer.byteLength(response));
       res.send(500, response);
       res.end();
     };
@@ -400,10 +399,7 @@ exports.getResults = function (req, res, options, request_body) {
                     value: new_access_token,
                     prop: { expires: expiresDate, path: '/api', httpOnly: true, secure: true }
                   });
-                }, function(err_message){
-                  if(typeof err_message !== 'object' && err_message !== null) {
-                    err_message = {error:err_message, stack: 'at _refreshToken in services.js', type:'SyntaxError'};
-                  }
+                }, function(){
                   // refresh token invalid, send back result as is
                   _parseResponse(proxy_response);
                 });
@@ -451,6 +447,7 @@ exports.getResults = function (req, res, options, request_body) {
       proxy_request.write(proxy_request_body);
     }
     proxy_request.end();
+
   } catch (error) {
     if (global.bugsenseKey) {
       global.bugsense.logError(error);
