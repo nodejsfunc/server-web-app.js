@@ -10,13 +10,14 @@
  * @param req
  * @param res
  */
+
 exports.index = function (req, res) {
 
   try {
     // Require this header as a CSRF prevention measurement.
-      // For more information see
-      // https://tools.mobcastdev.com/jira/browse/CWA-1305
-      if (req.headers['x-requested-by'] !== 'blinkbox') {
+    // For more information see
+    // https://tools.mobcastdev.com/jira/browse/CWA-1305
+    if (req.headers['x-requested-by'] !== 'blinkbox') {
       res.send(403);
       res.end();
       return;
@@ -48,7 +49,7 @@ exports.index = function (req, res) {
 
         // if path is requesting user details, append user id to url
         if(options.host === domains.auth.options.host && req.method === 'GET' &&
-          (options.path === '/users' || options.path.substr(0, 7) === '/users?')){
+            (options.path === '/users' || options.path.substr(0, 7) === '/users?')){
           if(req.cookies.hasOwnProperty(global.const.AUTH_ACCESS_TOKEN_NAME)){
             var token = req.cookies[global.const.AUTH_ACCESS_TOKEN_NAME];
             global.repository.get(token).then(function(value){ // on success
