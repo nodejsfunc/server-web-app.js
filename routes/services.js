@@ -4,12 +4,14 @@ var express = require('express'),
 	global = require('./../config/global'),
 	config = require('./../config/config1'),
 	repository = require('./../config/repository'),
+	middleware = require('./../middleware'),
 	router = express.Router(),
 	http = require('http'),
 	https = require('https');
 
-// todo make this general :service/:path
-router.get('/:path', function(req, res){
+router.use('/:domain/:path', middleware.domain);
+
+router.get('/:domain/:path', function(req, res){
 	var options = config.api_domains.auth.options;
 	options.path = req.params.path;
 

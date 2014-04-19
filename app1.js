@@ -7,28 +7,20 @@ var express = require('express'),
 	port = process.env.PORT || 3000,
 	global = require('./config/global'),
 	config = require('./config/config1'),
-	powered = require('./middleware/powered'),
-	requested = require('./middleware/requested'),
-	routes = {
-		local: require('./routes/local'),
-		auth: require('./routes/auth')
-	};
+	middleware = require('./middleware'),
+	routes = require('./routes');
 
 // Configure application
 var app = express();
 app.use(bodyParser());
 app.use(cookieParser());
 app.use(logger('dev'));
-app.use(powered);
-app.use(requested);
+app.use(middleware.powered);
+app.use(middleware.requested);
 
 // Register routes
 app.use(global.LOCAL_PATH, routes.local);
-for(var domain in config.api_domains){
-	if(routes[domain]){
-		app.use('/api/'+domain, routes[domain]);
-	}
-}
+app.use('/api', routes.services);
 
 // Start server
 app.listen(port);
