@@ -17,6 +17,13 @@ app.use(function(req, res, next){
 	res.setHeader('X-Powered-By', global.APP_NAME + global.APP_VERSION);
 	next();
 });
+app.use(function(req, res, next){
+	if (req.headers['x-requested-by'] !== 'blinkbox') {
+		res.send(403);
+	} else {
+		next();
+	}
+});
 
 // Register routes
 app.use(global.LOCAL_PATH, local);
