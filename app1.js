@@ -32,9 +32,8 @@ app.use(function(req, res, next){
 // Register routes
 app.use(global.LOCAL_PATH, routes.local);
 for(var domain in config.api_domains){
-	console.log(domain);
 	if(routes[domain]){
-		app.use(domain, routes[domain]);
+		app.use('/api/'+domain, routes[domain]);
 	}
 }
 
