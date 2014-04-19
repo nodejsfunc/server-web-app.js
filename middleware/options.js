@@ -4,8 +4,19 @@ var config = require('./../config/config1');
 
 module.exports = function(req, res, next){
 
-	var options = config.api_domains[req.params.domain].options;
-	options.path = req.params.path;
+	if(!req.params || !req.params[0]){
+		return next('No path specified');
+	}
+
+	var domain = config.api_domains[req.params.domain], path = req.params[0], options = domain.options;
+
+	if (domain.hasOwnProperty('root') && domain.root.length > 0) {
+		// if there is a root, use this as the start of the URI
+		options.path = '/' + domain.root + '/' + path;
+	} else {
+		// else start from the third component
+		options.path = '/' + path;
+	}
 
 	// Build proxy request headers by copying across request headers from client request
 	var headers = {};
