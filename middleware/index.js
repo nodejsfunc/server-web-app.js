@@ -3,5 +3,6 @@
 module.exports = {
 	domain: require('./domain'),
 	powered: require('./powered'),
-	requested: require('./requested')
+	requested: require('./requested'),
+	options: require('./options')
 };
