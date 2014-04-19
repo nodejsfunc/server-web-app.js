@@ -2,7 +2,8 @@
 
 var express = require('express'),
 	global = require('./../config/global'),
-	// repository = require('./public/javascripts/repository'),
+	config = require('./../config/config'),
+	repository = require('./../config/repository'),
 	router = express.Router();
 
 router
@@ -10,7 +11,7 @@ router
 		var access_token = req.cookies[global.AUTH_ACCESS_TOKEN_NAME];
 
 		// delete token from redis repository
-		// global.repository.del(access_token);
+		repository.del(access_token);
 
 		// delete cookie in browser
 		res.clearCookie(global.AUTH_ACCESS_TOKEN_NAME, { path: '/api' });
@@ -19,8 +20,7 @@ router
 		res.end();
 	})
 	.get(global.CLIENT_CONFIG_PATH, function(req, res){
-		//res.send(200, global.clientConfig);
-		res.send(200, {test: 1});
+		res.send(200, config.clientConfig);
 		res.end();
 	});
 
