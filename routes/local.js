@@ -2,7 +2,7 @@
 
 var express = require('express'),
 	global = require('./../config/global'),
-	config = require('./../config/config'),
+	config = require('./../config/config1'),
 	repository = require('./../config/repository'),
 	router = express.Router();
 

@@ -12,6 +12,8 @@ var express = require('express'),
 
 // Configure application
 var app = express();
+
+app.enable('trust proxy'); // required for nginx
 app.use(bodyParser());
 app.use(cookieParser());
 app.use(logger('dev'));

@@ -1,6 +1,11 @@
 'use strict';
 
-var config = require('./../config/config1');
+/**
+ * Middleware that will generate the http options object, based on the request data.
+ * This object will be used later, therefore it will be saved as part of the request.
+ * */
+
+var config = require('./../config/config1'), global = require('./../config/global');
 
 module.exports = function(req, res, next){
 
