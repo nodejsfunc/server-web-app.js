@@ -18,6 +18,11 @@ router
 	.use(path, function(req, res){
 		// Make the proxy HTTP request
 		var proxy_scheme = req.options.port === 443 ? https : http;
+		var proxy_request_body;
+
+		if (req.method === 'POST' || req.method === 'PATCH') {
+			proxy_request_body = querystring.stringify(req.body);
+		}
 
 		// make proxy request
 		var _updateAccessToken = function(oldAT, newAT, obj){
@@ -65,7 +70,6 @@ router
 				res.status(proxy_response.statusCode);
 			}
 			var response_body = '';
-
 			proxy_response.on('data', function (chunk) {
 				response_body += chunk;
 				if (!chunked) {
