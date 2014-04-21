@@ -1,6 +1,6 @@
 'use strict';
 
-var redis = require('redis').createClient(global.databasePort, global.databaseDomain);
+var global = require('./global'), config = require('./config1'), redis = require('redis').createClient(config.databasePort, config.databaseDomain);
 redis.on('error', function redisError(error){
 	console.log('\u001b[31m', 'Redis error --> ', error, '\u001b[0m');
 });
@@ -9,7 +9,7 @@ module.exports = {
 	set: function(key, value){
 		if(key && value){
 			// all redis entries are deleted after a certain time
-			redis.set(key, value, 'PX', global.const.AUTH_MAX_AGE);
+			redis.set(key, value, 'PX', global.AUTH_MAX_AGE);
 		} else {
 			console.log('Error options for redis SET', key, '-', value);
 		}

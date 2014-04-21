@@ -74,7 +74,7 @@ router
 				response_body += chunk;
 				if (!chunked) {
 					// If appropriate, translate the authentication OAuth2 bearer token back to a cookie
-					if ((req.path.indexOf(global.AUTH_PATH_COMPONENT) !== -1 || req.path.indexOf(global.AUTH_USERS_PATH) !== -1) &&
+					if ((req.options.path.indexOf(global.AUTH_PATH_COMPONENT) !== -1 || req.options.path.indexOf(global.AUTH_USERS_PATH) !== -1) &&
 						proxy_response.headers.hasOwnProperty('content-type') &&
 						proxy_response.headers['content-type'].indexOf('application/json') === 0) {
 						try {
@@ -91,6 +91,7 @@ router
 
 								// handle persistent and non-persistent authentication
 								var expiresDate = req.param(global.AUTH_PARAM_REMEMBER_ME) === 'true' ? new Date(Date.now() + global.AUTH_MAX_AGE) : null;
+
 								res.cookie(global.AUTH_ACCESS_TOKEN_NAME, access_token, { path: '/api', expires: expiresDate, httpOnly: true, secure: true });
 
 								// save new access token
@@ -104,11 +105,13 @@ router
 								delete json_response[global.AUTH_REFRESH_TOKEN_NAME];
 								delete json_response[global.AUTH_ACCESS_TOKEN_NAME];
 								chunk = JSON.stringify(json_response);
+
 								res.setHeader('Content-Length', Buffer.byteLength(chunk));
 							}
 						}
 						catch (e) {
 							console.log('Invalid JSON when attempting to parse response body for auth token');
+							console.log(e);
 						}
 					}
 				}
@@ -218,7 +221,6 @@ router
 		};
 		// console.log(options, proxy_request_body, req.body);
 		// make request on behalf of the website
-
 		var proxy_request = _request(req.options,
 			// on success
 			function(proxy_response){
@@ -231,8 +233,8 @@ router
 				var error_message = proxy_response.headers['www-authenticate'] || '';
 				if(proxy_response.statusCode === 401 && (error_message.indexOf(global.INVALID_TOKEN) !== -1 || error_message.indexOf(global.EXPIRED_TOKEN) !== -1)){
 					// get refresh token for the invalid token
-					if(options.headers.Authorization){
-						var access_token = options.headers.Authorization.substr('Bearer '.length);
+					if(req.options.headers.Authorization){
+						var access_token = req.options.headers.Authorization.substr('Bearer '.length);
 
 						repository.get(access_token).then(function(value){
 							try{
@@ -255,10 +257,10 @@ router
 									});
 
 									// update authorization
-									options.headers.Authorization = 'Bearer '+ new_access_token;
+									req.options.headers.Authorization = 'Bearer '+ new_access_token;
 
 									// redo the request
-									_request(options, _parseResponse, _errorHandler, {
+									_request(req.options, _parseResponse, _errorHandler, {
 										name: global.AUTH_ACCESS_TOKEN_NAME,
 										value: new_access_token,
 										prop: { expires: expiresDate, path: '/api', httpOnly: true, secure: true }
