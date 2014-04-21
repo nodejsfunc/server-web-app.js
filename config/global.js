@@ -5,9 +5,18 @@ var package_json = require('./../package.json');
 module.exports = {
 	APP_NAME: package_json.name,
 	APP_VERSION: package_json.version,
+	TOKEN_STORAGE_VERSION : '2.0.0',
 	AUTH_ACCESS_TOKEN_NAME : 'access_token',
-	SIGN_OUT_PATH: '/signout',
-	LOCAL_PATH: '/api/local/',
+	AUTH_REFRESH_TOKEN_NAME : 'refresh_token',
+	AUTH_PATH_COMPONENT : 'oauth2',
+	AUTH_USERS_PATH : '/auth/users',
+	AUTH_PARAM_REMEMBER_ME : 'remember_me',
+	BBB_CONTENT_TYPE : 'application/vnd.blinkboxbooks.data',
+	AUTH_MAX_AGE : 1000*60*60*24*14, // 14 days
+	REFRESH_TOKEN_PATH: '/oauth2/token',
+	LOCAL_PATH : '/api/local',
+	SIGN_OUT_PATH : '/signout',
+	BASE_PATH: '/api',
 	CLIENT_CONFIG_PATH: '/config',
 	CREDIT_CARD_PATH: '/service/my/creditcards',
 	BASKET_PATH: '/service/my/baskets',
@@ -17,4 +26,7 @@ module.exports = {
 	LIBRARY_PATH: '/service/my/library',
 	ADMIN_PATH: '/service/admin/users/',
 	ADMIN_CREDIT_PATH: 'credit',
+	EXPIRED_TOKEN: 'The access token expired',
+	INVALID_TOKEN: 'Access token is invalid',
+	UNVERIFIED_IDENTITY: 'User identity must be reverified'
 };

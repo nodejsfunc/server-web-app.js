@@ -22,7 +22,7 @@ app.use(middleware.requested);
 
 // Register routes
 app.use(global.LOCAL_PATH, routes.local);
-app.use('/api', routes.services);
+app.use(global.BASE_PATH, routes.services);
 
 // Start server
 app.listen(port);
