@@ -1,6 +1,6 @@
 'use strict';
 
-var constants = require('./../config/constants'), config = require('./../config/config1');
+var constants = require('./../config/constants'), config = require('./../config/config');
 
 module.exports = function(req, res, next){
 	// the bodyparser of express.js is unable to parse anything other than JSON or form parameters (req.body is empty)

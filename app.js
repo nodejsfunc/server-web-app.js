@@ -1,42 +1,35 @@
 'use strict';
 
-/* globals global */
-
-/**
- * Module dependencies.
- */
 var express = require('express'),
-  common = require('./routes/common'),
-  path = require('path'),
-  http = require('http'),
-  https = require('https'),
-  querystring = require('querystring');
+	bodyParser = require('body-parser'),
+	cookieParser = require('cookie-parser'),
+	timeout = require('connect-timeout'),
+	logger = require('morgan'),
+	port = process.env.PORT || 3000,
+	constants = require('./config/constants'),
+	config = require('./config/config'),
+	middleware = require('./scripts'),
+	routes = require('./routes');
 
-
-// Global variables
-global.http = http;
-global.https = https;
-global.querystring = querystring;
-
-// Paths
-global.servicesPath = __dirname + '/public/javascripts/services.js';
-global.repositoryPath = __dirname + '/public/javascripts/repository.js';
-
+// Configure application
 var app = express();
 
-/**
- * Environment config specific variables
- */
-require('./config/config.js');
+app.enable('trust proxy'); // required for nginx
+app.use(bodyParser());
+app.use(cookieParser());
+app.use(logger('dev'));
+app.use(timeout(config.api_timeout * 1000));
+app.use(middleware.powered);
+app.use(middleware.requested);
 
-/**
- *  New relic module (load it only if we are in production)
- */
-if (global.newRelicKey !== '') {
-  require('newrelic');
-}
+// Register routes
+app.use(constants.LOCAL_PATH, routes.local);
+app.use(constants.BASE_PATH, routes.services);
+app.use(middleware.error);
 
-/**
+// Start server
+app.listen(port);
+console.log('Express server listening on port ' + port);/**
  * Bugsense configuration
  *
  */

@@ -4,7 +4,7 @@
  * See lib/config.defaults.js in the agent distribution for a more complete
  * description of configuration variables and their potential values.
  */
-var config = require('./config/config1');
+var config = require('./config/config');
 
 exports.config = {
   /**

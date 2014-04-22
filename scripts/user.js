@@ -1,6 +1,6 @@
 'use strict';
 
-var config = require('./../config/config1'),
+var config = require('./../config/config'),
 	constants = require('./../config/constants'),
 	repository = require('./../config/repository'),
 	querystring = require('querystring');

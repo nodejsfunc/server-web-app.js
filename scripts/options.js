@@ -5,7 +5,7 @@
  * This object will be used later, therefore it will be saved as part of the request.
  * */
 
-var config = require('./../config/config1'), constants = require('./../config/constants');
+var config = require('./../config/config'), constants = require('./../config/constants');
 
 module.exports = function(req, res, next){
 

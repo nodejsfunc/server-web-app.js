@@ -1,6 +1,6 @@
 'use strict';
 
-var config = require('./../config/config1');
+var config = require('./../config/config');
 
 module.exports = function(req, res, next){
 	if(!config.api_domains.hasOwnProperty(req.params.domain)){
