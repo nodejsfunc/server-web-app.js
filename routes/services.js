@@ -4,7 +4,7 @@ var express = require('express'),
 	constants = require('./../config/constants'),
 	config = require('./../config/config1'),
 	repository = require('./../config/repository'),
-	middleware = require('./../middleware'),
+	middleware = require('./../scripts'),
 	router = express.Router(),
 	http = require('http'),
 	https = require('https'),
@@ -293,22 +293,7 @@ router
 		);
 
 		// set a timeout handler
-		req.socket.removeAllListeners('timeout');
-		req.socket.setTimeout(config.api_timeout * 1000);
-		req.socket.on('timeout', function () {
-			if(res.headersSent){
-				return;
-			}
-
-			// return 504 message
-			var message = '<html><head><title>504 Gateway Time-out</title></head>'+
-				'<body bgcolor="white">'+
-				'<center><h1>504 Gateway Time-out</h1></center>'+
-				'<hr>'+
-				'</body></html>';
-			res.send(504, message);
-			res.end();
-
+		req.on('timeout', function () {
 			// cancel any ongoing requests
 			proxy_request.abort();
 		});
@@ -317,7 +302,6 @@ router
 			proxy_request.write(proxy_request_body);
 		}
 		proxy_request.end();
-
 	});
 
 module.exports = router;

@@ -6,5 +6,6 @@ module.exports = {
 	requested: require('./requested'),
 	options: require('./options'),
 	reverse: require('./reverse'),
-	user: require('./user')
+	user: require('./user'),
+	error: require('./error')
 };
