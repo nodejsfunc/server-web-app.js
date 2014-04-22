@@ -1,7 +1,6 @@
 'use strict';
 
 module.exports = function(err, req, res, next){
-	console.log(err);
 	if(!err){
 		return next()
 	} else if(err.timeout){
