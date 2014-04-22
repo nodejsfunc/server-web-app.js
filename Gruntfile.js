@@ -25,9 +25,7 @@ module.exports = function (grunt) {
       all: [
         'Gruntfile.js',
         'app.js',
-        'config/**/*.js',
-				'routes/**/*.js',
-				'public/**/*.js'
+        'app/**/*.js'
 			]
     },
     copy: {
