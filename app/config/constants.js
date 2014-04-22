@@ -1,6 +1,6 @@
 'use strict';
 
-var package_json = require('./../package.json');
+var package_json = require('./../../package.json');
 
 module.exports = {
 	APP_NAME: package_json.name,

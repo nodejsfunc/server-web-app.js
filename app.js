@@ -6,10 +6,10 @@ var express = require('express'),
 	timeout = require('connect-timeout'),
 	logger = require('morgan'),
 	port = process.env.PORT || 3000,
-	constants = require('./config/constants'),
-	config = require('./config/config'),
-	middleware = require('./scripts'),
-	routes = require('./routes');
+	constants = require('./app/config/constants'),
+	config = require('./app/config/config'),
+	middleware = require('./app/scripts'),
+	routes = require('./app/routes');
 
 // Configure application
 var app = express();
