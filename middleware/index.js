@@ -5,5 +5,6 @@ module.exports = {
 	powered: require('./powered'),
 	requested: require('./requested'),
 	options: require('./options'),
-	reverse: require('./reverse')
+	reverse: require('./reverse'),
+	user: require('./user')
 };
