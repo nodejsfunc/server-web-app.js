@@ -14,9 +14,11 @@ module.exports = function(req, res, next){
 				try{
 					var user_data = JSON.parse(value);
 					var user_id = user_data.user_id;
-					var noCache = req.options.path.indexOf('no-cache') !== -1;
 
-					if (!noCache) {
+					if (req.query['no-cache']) {
+						// make request with user id
+						req.options.path = '/users/' + user_id;
+					} else {
 						// todo overriding req param is not necessary, simply make the request and return the result
 						req.body = {
 							refresh_token: user_data.refresh_token,
@@ -32,9 +34,6 @@ module.exports = function(req, res, next){
 							'Content-Length': Buffer.byteLength(querystring.stringify(req.body))
 						};
 						req.method = 'POST';
-					} else {
-						// make request with user id
-						req.options.path = '/users/' + user_id;
 					}
 					next();
 				} catch(e) {
