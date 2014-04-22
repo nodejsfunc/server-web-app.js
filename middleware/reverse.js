@@ -1,6 +1,6 @@
 'use strict';
 
-var global = require('./../config/global'), config = require('./../config/config1');
+var constants = require('./../config/constants'), config = require('./../config/config1');
 
 module.exports = function(req, res, next){
 	// the bodyparser of express.js is unable to parse anything other than JSON or form parameters (req.body is empty)
@@ -9,31 +9,31 @@ module.exports = function(req, res, next){
 	// this is only required for POST/PATCH/DELETE
 	if(req.method !== 'GET' && req.headers.accept && req.options.host === config.api_domains['secure-service'].options.host){
 		var _isCreditCardService = function(){
-			return req.options.path.indexOf(global.CREDIT_CARD_PATH) === 0;
+			return req.options.path.indexOf(constants.CREDIT_CARD_PATH) === 0;
 		};
 	
 		var _isBasketService = function(){
-			return req.options.path.indexOf(global.BASKET_PATH) === 0;
+			return req.options.path.indexOf(constants.BASKET_PATH) === 0;
 		};
 	
 		var _isPurchaseService = function(){
-			return req.options.path.indexOf(global.PURCHASE_PATH) === 0;
+			return req.options.path.indexOf(constants.PURCHASE_PATH) === 0;
 		};
 	
 		var _isClubcardService = function(){
-			return req.options.path.indexOf(global.CLUBCARD_PATH) === 0;
+			return req.options.path.indexOf(constants.CLUBCARD_PATH) === 0;
 		};
 	
 		var _isClubcardValidationService = function(){
-			return req.options.path.indexOf(global.CLUBCARD_VALIDATION_PATH) === 0;
+			return req.options.path.indexOf(constants.CLUBCARD_VALIDATION_PATH) === 0;
 		};
 	
 		var _isLibraryService = function(){
-			return req.options.path.indexOf(global.LIBRARY_PATH) === 0;
+			return req.options.path.indexOf(constants.LIBRARY_PATH) === 0;
 		};
 	
 		var _isAdminCreditService = function(){
-			return req.options.path.indexOf(global.ADMIN_PATH) === 0 && req.options.path.indexOf(global.ADMIN_CREDIT_PATH) !== -1;
+			return req.options.path.indexOf(constants.ADMIN_PATH) === 0 && req.options.path.indexOf(constants.ADMIN_CREDIT_PATH) !== -1;
 		};
 	
 		if(

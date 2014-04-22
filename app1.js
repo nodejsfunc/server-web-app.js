@@ -5,7 +5,7 @@ var express = require('express'),
 	cookieParser = require('cookie-parser'),
 	logger = require('morgan'),
 	port = process.env.PORT || 3000,
-	global = require('./config/global'),
+	constants = require('./config/constants'),
 	config = require('./config/config1'),
 	middleware = require('./middleware'),
 	routes = require('./routes');
@@ -21,8 +21,8 @@ app.use(middleware.powered);
 app.use(middleware.requested);
 
 // Register routes
-app.use(global.LOCAL_PATH, routes.local);
-app.use(global.BASE_PATH, routes.services);
+app.use(constants.LOCAL_PATH, routes.local);
+app.use(constants.BASE_PATH, routes.services);
 
 // Start server
 app.listen(port);

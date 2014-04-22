@@ -5,7 +5,7 @@
  * This object will be used later, therefore it will be saved as part of the request.
  * */
 
-var config = require('./../config/config1'), global = require('./../config/global');
+var config = require('./../config/config1'), constants = require('./../config/constants');
 
 module.exports = function(req, res, next){
 
@@ -44,8 +44,8 @@ module.exports = function(req, res, next){
 	// if present, translate access_token cookie to OAuth2 Authorisation header with bearer token
 	// NOTE: the node app may be communicating with services behind the same firewall or on a different domain entirely (as is the case with nodejs-internal)
 	// so we don't want to add the OAUTH2 header if communicating on port 80
-	if (req.cookies.hasOwnProperty(global.AUTH_ACCESS_TOKEN_NAME) && options.port !== 80) {
-		headers.Authorization = 'Bearer '+ req.cookies[global.AUTH_ACCESS_TOKEN_NAME];
+	if (req.cookies.hasOwnProperty(constants.AUTH_ACCESS_TOKEN_NAME) && options.port !== 80) {
+		headers.Authorization = 'Bearer '+ req.cookies[constants.AUTH_ACCESS_TOKEN_NAME];
 	}
 
 	options.headers = headers;
