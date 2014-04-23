@@ -2,8 +2,8 @@
 
 module.exports = {
 	domain: require('./domain'),
-	powered: require('./powered'),
-	requested: require('./requested'),
+	poweredByHeader: require('./poweredByHeader'),
+	csrfHeader: require('./csrfHeader'),
 	options: require('./options'),
 	reverse: require('./reverse'),
 	user: require('./user'),

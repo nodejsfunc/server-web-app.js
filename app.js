@@ -16,12 +16,12 @@ var express = require('express'),
 var app = express();
 
 app.enable('trust proxy'); // required for nginx
+app.use(middleware.csrfHeader);
+app.use(middleware.poweredByHeader);
 app.use(bodyParser());
 app.use(cookieParser());
 app.use(logger('dev'));
 app.use(timeout(config.api_timeout * 1000));
-app.use(middleware.powered);
-app.use(middleware.requested);
 
 // Register routes
 app.use(constants.LOCAL_PATH, routes.local);
