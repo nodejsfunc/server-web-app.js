@@ -1,6 +1,6 @@
 'use strict';
 
-var constants = require('../config/constants')
+var constants = require('../config/constants');
 
 module.exports = function(err, req, res, next){
 	if(!err){

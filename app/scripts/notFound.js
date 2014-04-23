@@ -1,7 +1,7 @@
 
 'use strict';
 
-var constants = require('../config/constants')
+var constants = require('../config/constants');
 
 module.exports = function(req, res){
 	var response = JSON.stringify({ code: 404, error: '404 Not found' });
