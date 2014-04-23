@@ -10,6 +10,7 @@ var merchant_arg = process.argv.indexOf('-merchantKey'),
 		databaseDomain: config.databaseDomain,
 		databasePort: config.databasePort,
 		newRelicKey: config.newRelicKey || '',
+		bugsenseKey: config.bugsenseKey || '',
 		// Override the client config if defined in the command line parameters
 		clientConfig: {
 			'merchantKey': merchant_arg !== -1 ? process.argv[merchant_arg + 1] : config.clientConfig.merchantKey,
@@ -21,6 +22,7 @@ var merchant_arg = process.argv.indexOf('-merchantKey'),
 
 // bugsense api key is hard-coded for live, until ops adds the command line param
 result.clientConfig.bugsenseKey = !result.clientConfig.bugsenseKey && result.clientConfig.nonSecureServicesDomain === 'api.blinkboxbooks.com' ? '9fa7c727' : result.clientConfig.bugsenseKey;
+result.bugsenseKey = !result.bugsenseKey && result.clientConfig.nonSecureServicesDomain === 'api.blinkboxbooks.com'? '649f61e5': '';
 
 module.exports = result;
 

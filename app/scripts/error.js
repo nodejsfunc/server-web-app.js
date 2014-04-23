@@ -1,6 +1,6 @@
 'use strict';
 
-var constants = require('../config/constants');
+var constants = require('../config/constants'), bugsense = require('./../config/bugsense');
 
 module.exports = function(err, req, res, next){
 	if(!err){
@@ -15,4 +15,5 @@ module.exports = function(err, req, res, next){
 		res.setHeader('Content-Length', Buffer.byteLength(response));
 		res.send(500, response);
 	}
+	bugsense.logError(err);
 };
