@@ -24,11 +24,7 @@ describe('Domain', function(){
 
 	it('should return 404 when the domain is not registered in config.json', function(done){
 		request
-			.get('/')
-			.expect(404);
-
-		request
-			.get('/invalidDomain')
+			.get('/invalidDomain/path')
 			.expect(404, done);
 	});
 
