@@ -38,7 +38,6 @@ global.const = {
  * To change this template use File | Settings | File Templates.
  */
 exports.getResults = function (req, res, options, request_body) {
-
   var proxy_request_body = request_body;
 
   if (!proxy_request_body) {
@@ -158,54 +157,54 @@ exports.getResults = function (req, res, options, request_body) {
   }
 
   // Make the proxy HTTP request
-	var proxy_scheme = options.port === 443 ? https : http;
+  var proxy_scheme = options.port === 443 ? https : http;
 
-	var _updateAccessToken = function(oldAT, newAT, obj){
-		// add semantic version number:
-		obj.version = global.const.TOKEN_STORAGE_VERSION;
+  var _updateAccessToken = function(oldAT, newAT, obj){
+    // add semantic version number:
+    obj.version = global.const.TOKEN_STORAGE_VERSION;
 
-		// delete old access token, if it exists
-		global.repository.del(oldAT);
+    // delete old access token, if it exists
+    global.repository.del(oldAT);
 
-		// set the access/refresh token in the key/value store
-		global.repository.set(newAT, JSON.stringify(obj));
-	};
+    // set the access/refresh token in the key/value store
+    global.repository.set(newAT, JSON.stringify(obj));
+  };
 
-	/**
-	 * Will parse the response for the website by setting the headers, handling cookies etc.
-	 * Notice: This method will sends data back to the website
-	 * @param proxy_response The response object
-	 * @private
-	 */
-	var _parseResponse = function(proxy_response){
+  /**
+   * Will parse the response for the website by setting the headers, handling cookies etc.
+   * Notice: This method will sends data back to the website
+   * @param proxy_response The response object
+   * @private
+   */
+  var _parseResponse = function(proxy_response){
     if(res.headersSent){
-			return;
-		}
-		var chunked = proxy_response.headers['transfer-encoding'] === 'chunked';
+      return;
+    }
+    var chunked = proxy_response.headers['transfer-encoding'] === 'chunked';
 
-		var response_headers = {};
-		// copy accross headers from proxy response to response
-		for (var header in proxy_response.headers) {
-			response_headers[header] = proxy_response.headers[header];
-		}
-		response_headers['X-Powered-By'] = global.app_name + global.app_version;
+    var response_headers = {};
+    // copy accross headers from proxy response to response
+    for (var header in proxy_response.headers) {
+      response_headers[header] = proxy_response.headers[header];
+    }
+    response_headers['X-Powered-By'] = global.app_name + global.app_version;
 
-		// transform API services content-type to application/json
-		if (proxy_response.headers.hasOwnProperty('content-type')) {
-			if (proxy_response.headers['content-type'].indexOf(global.const.BBB_CONTENT_TYPE) === 0) {
-				response_headers['content-type'] = 'application/json';
-			}
-		}
+    // transform API services content-type to application/json
+    if (proxy_response.headers.hasOwnProperty('content-type')) {
+      if (proxy_response.headers['content-type'].indexOf(global.const.BBB_CONTENT_TYPE) === 0) {
+        response_headers['content-type'] = 'application/json';
+      }
+    }
     // set status code if chunked
-		if(chunked){
-			res.writeHead(proxy_response.statusCode, response_headers);
-		} else {
-			for(var index in response_headers){
-				res.setHeader(index, response_headers[index]);
-			}
+    if(chunked){
+      res.writeHead(proxy_response.statusCode, response_headers);
+    } else {
+      for(var index in response_headers){
+        res.setHeader(index, response_headers[index]);
+      }
       res.status(proxy_response.statusCode);
-		}
-		var response_body = '';
+    }
+    var response_body = '';
 
     proxy_response.on('data', function (chunk) {
       response_body += chunk;
@@ -246,205 +245,213 @@ exports.getResults = function (req, res, options, request_body) {
           }
           catch (e) {
             console.log('Invalid JSON when attempting to parse response body for auth token');
+            if (global.bugsenseKey) {
+              e.message += ' - Invalid JSON when attempting to parse response body for auth token';
+              global.bugsense.logError(e);
+            }
           }
         }
       }
       res.write(chunk);
     });
 
-		proxy_response.on('end', function() {
-			res.end();
-		});
-	};
+    proxy_response.on('end', function() {
+      res.end();
+    });
+  };
 
-	/**
-	 * perform a request
-	 * @param options request options
-	 * @param onSuccess function to call on successful request
-	 * @param onError function to call on failure request
-	 * @returns {*} return the response object
-	 * @private
-	 */
-	var _request = function(options, onSuccess, onError, cookie){
-		var request = proxy_scheme.request(options, function(proxy_response){
-			if(res.headersSent){
-				return;
-			}
-			// update cookie on success
-			if(cookie && proxy_response.statusCode === 200){
-				res.cookie(cookie.name, cookie.value, cookie.prop);
-			}
-			onSuccess(proxy_response);
-		}).on('error', function(err){
-			if(typeof onError === 'function'){
-				onError(err);
-			}
-		});
-		request.end();
-		return request;
-	};
+  /**
+   * perform a request
+   * @param options request options
+   * @param onSuccess function to call on successful request
+   * @param onError function to call on failure request
+   * @returns {*} return the response object
+   * @private
+   */
+  var _request = function(options, onSuccess, onError, cookie){
+    var request = proxy_scheme.request(options, function(proxy_response){
+      if(res.headersSent){
+        return;
+      }
+      // update cookie on success
+      if(cookie && proxy_response.statusCode === 200){
+        res.cookie(cookie.name, cookie.value, cookie.prop);
+      }
+      onSuccess(proxy_response);
+    }).on('error', function(err){
+      if(typeof onError === 'function'){
+        onError(err);
+      }
+    });
+    request.end();
+    return request;
+  };
 
-	var _refreshTokenOptions = function(post_data){
-		return {
-			host: global.api_domains.auth.options.host,
-			path: global.const.REFRESH_TOKEN_PATH,
-			port: global.api_domains.auth.options.port,
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded',
-				'Content-Length': Buffer.byteLength(post_data)
-			}
-		};
-	};
+  var _refreshTokenOptions = function(post_data){
+    return {
+      host: global.api_domains.auth.options.host,
+      path: global.const.REFRESH_TOKEN_PATH,
+      port: global.api_domains.auth.options.port,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(post_data)
+      }
+    };
+  };
 
-	/**
-	 * function that refreshes the access token (AT)
-	 * @param refresh_token the refresh token to use to get a new AT
-	 * @param onSuccess function to call when getting a new AT
-	 * @param onError function to call on error
-	 * @private
-	 */
-	var _refreshToken = function(refresh_token, onSuccess, onError){
-		var post_data = global.querystring.stringify({
-			refresh_token: refresh_token,
-			grant_type: global.const.AUTH_REFRESH_TOKEN_NAME
-		});
-		var obj;
-		var post_req = _request(_refreshTokenOptions(post_data), function(response){
-			if(response.statusCode === 200){
-				response.on('data', function (chunk) {
-					try{
-						obj = JSON.parse(chunk + '');
-					} catch(err){
-						if(typeof onError === 'function'){
-							onError('Invalid JSON when attempting to parse response body for refresh token');
-						}
-					}
-				});
-				response.on('end', function() {
-					if(typeof onSuccess === 'function'){
-						onSuccess(obj);
-					}
-				});
-			} else {
-				if(typeof onError === 'function'){
-					onError();
-				}
-			}
-		}, function(error){
-			if(typeof onError === 'function'){
-				onError(error);
-			}
-		});
-		post_req.write(post_data);
-		post_req.end();
-	};
+  /**
+   * function that refreshes the access token (AT)
+   * @param refresh_token the refresh token to use to get a new AT
+   * @param onSuccess function to call when getting a new AT
+   * @param onError function to call on error
+   * @private
+   */
+  var _refreshToken = function(refresh_token, onSuccess, onError){
+    var post_data = global.querystring.stringify({
+      refresh_token: refresh_token,
+      grant_type: global.const.AUTH_REFRESH_TOKEN_NAME
+    });
+    var obj;
+    var post_req = _request(_refreshTokenOptions(post_data), function(response){
+      if(response.statusCode === 200){
+        response.on('data', function (chunk) {
+          try{
+            obj = JSON.parse(chunk + '');
+          } catch(err){
+            if(typeof onError === 'function'){
+              onError('Invalid JSON when attempting to parse response body for refresh token');
+            }
+          }
+        });
+        response.on('end', function() {
+          if(typeof onSuccess === 'function'){
+            onSuccess(obj);
+          }
+        });
+      } else {
+        if(typeof onError === 'function'){
+          onError();
+        }
+      }
+    }, function(error){
+      if(typeof onError === 'function'){
+        onError(error);
+      }
+    });
+    post_req.write(post_data);
+    post_req.end();
+  };
 
-	// generic error handler
-	var _errorHandler = function (e) {
-		if(res.headersSent){
-			return;
-		}
-		var msg = { error: e.message.replace(/\"/g, '') };      // strip any double quotes TODO: should handle single quotes too
-		var response = JSON.stringify(msg);
-		console.log('error', msg); //uncomment to see error message
-		res.set('Content-Type', 'application/json');
-		res.set('Content-length', Buffer.byteLength(response));
-		res.send(500, response);
-		res.end();
-	};
-	// console.log(options, proxy_request_body, req.body);
-	// make request on behalf of the website
-	var proxy_request = _request(options,
-		// on success
-		function(proxy_response){
-			// do not continue if the response has already been sent (example timeout)
-			if(res.headersSent){
-				return;
-			}
-			// console.log('response', proxy_response.statusCode);
-			// if token invalid/expired
-			var error_message = proxy_response.headers['www-authenticate'] || '';
-			if(proxy_response.statusCode === 401 && (error_message.indexOf(global.const.INVALID_TOKEN) !== -1 || error_message.indexOf(global.const.EXPIRED_TOKEN) !== -1)){
-				// get refresh token for the invalid token
-				if(options.headers.Authorization){
-					var access_token = options.headers.Authorization.substr('Bearer '.length);
+  // generic error handler
+  var _errorHandler = function (e) {
+    if(res.headersSent){
+      return;
+    }
+    var msg = { error: e.message.replace(/\"/g, '') };      // strip any double quotes TODO: should handle single quotes too
+    var response = JSON.stringify(msg);
+    console.log('error', msg); //uncomment to see error message
+    res.set('Content-Type', 'application/json');
+    res.set('Content-length', Buffer.byteLength(response));
+    res.send(500, response);
+    res.end();
 
-					global.repository.get(access_token).then(function(value){
-						try{
-							var obj = JSON.parse(value),
-								refresh_token = obj.refresh_token,
-								remember_me = !!obj.remember_me, // convert remember_me to its boolean value
-								user_id = obj.user_id;
-							// get new access token
-							_refreshToken(refresh_token, function(result){
-								var new_access_token = result.access_token;
+    if (global.bugsenseKey) {
+      global.bugsense.logError(e);
+    }
+  };
+  // console.log(options, proxy_request_body, req.body);
+  // make request on behalf of the website
+  var proxy_request = _request(options,
+    // on success
+    function(proxy_response){
+      // do not continue if the response has already been sent (example timeout)
+      if(res.headersSent){
+        return;
+      }
+      // console.log('response', proxy_response.statusCode);
+      // if token invalid/expired
+      var error_message = proxy_response.headers['www-authenticate'] || '';
+      if(proxy_response.statusCode === 401 && (error_message.indexOf(global.const.INVALID_TOKEN) !== -1 || error_message.indexOf(global.const.EXPIRED_TOKEN) !== -1)){
+        // get refresh token for the invalid token
+        if(options.headers.Authorization){
+          var access_token = options.headers.Authorization.substr('Bearer '.length);
 
-								// set expiry date
-								var expiresDate = remember_me ? new Date(Date.now() + global.const.AUTH_MAX_AGE) : null;
+          global.repository.get(access_token).then(function(value){
+            try{
+              var obj = JSON.parse(value),
+                refresh_token = obj.refresh_token,
+                remember_me = !!obj.remember_me, // convert remember_me to its boolean value
+                user_id = obj.user_id;
+              // get new access token
+              _refreshToken(refresh_token, function(result){
+                var new_access_token = result.access_token;
 
-								// save new access token
-								_updateAccessToken(access_token, new_access_token, {
-									refresh_token: refresh_token,
-									user_id: user_id,
-									remember_me: expiresDate !== null
-								});
+                // set expiry date
+                var expiresDate = remember_me ? new Date(Date.now() + global.const.AUTH_MAX_AGE) : null;
 
-								// update authorization
-								options.headers.Authorization = 'Bearer '+ new_access_token;
+                // save new access token
+                _updateAccessToken(access_token, new_access_token, {
+                  refresh_token: refresh_token,
+                  user_id: user_id,
+                  remember_me: expiresDate !== null
+                });
 
-								// redo the request
-								_request(options, _parseResponse, _errorHandler, {
-									name: global.const.AUTH_ACCESS_TOKEN_NAME,
-									value: new_access_token,
-									prop: { expires: expiresDate, path: '/api', httpOnly: true, secure: true }
-								});
-							}, function(){
-								// refresh token invalid, send back result as is
-								_parseResponse(proxy_response);
-							});
-						} catch(err) {
-							// JSON parsing failed, refresh token not found, send back the result as is
-							_parseResponse(proxy_response);
-						}
-					}, function(){
-						// Redis error, continue with response
-						_parseResponse(proxy_response);
-					});
-				} else {
-					// Token does not exist on the client, sending the response back as is
-					_parseResponse(proxy_response);
-				}
-			} else {
-				// everything is ok (200)
-				_parseResponse(proxy_response);
-			}
-		},
-		_errorHandler
-	);
+                // update authorization
+                options.headers.Authorization = 'Bearer '+ new_access_token;
+
+                // redo the request
+                _request(options, _parseResponse, _errorHandler, {
+                  name: global.const.AUTH_ACCESS_TOKEN_NAME,
+                  value: new_access_token,
+                  prop: { expires: expiresDate, path: '/api', httpOnly: true, secure: true }
+                });
+              }, function(){
+                // refresh token invalid, send back result as is
+                _parseResponse(proxy_response);
+              });
+            } catch(err) {
+              // JSON parsing failed, refresh token not found, send back the result as is
+              _parseResponse(proxy_response);
+            }
+          }, function(){
+            // Redis error, continue with response
+            _parseResponse(proxy_response);
+          });
+        } else {
+          // Token does not exist on the client, sending the response back as is
+          _parseResponse(proxy_response);
+        }
+      } else {
+        // everything is ok (200)
+        _parseResponse(proxy_response);
+      }
+    },
+    _errorHandler
+  );
 
   // set a timeout handler
   req.socket.removeAllListeners('timeout');
   req.socket.setTimeout(api_timeout * 1000);
   req.socket.on('timeout', function () {
-		if(res.headersSent){
-			return;
-		}
+    if(res.headersSent){
+      return;
+    }
 
-		// return 504 message
-		var message = '<html><head><title>504 Gateway Time-out</title></head>'+
-			'<body bgcolor="white">'+
-			'<center><h1>504 Gateway Time-out</h1></center>'+
-			'<hr>'+
-		'</body></html>';
-		res.send(504, message);
-		res.end();
+    // return 504 message
+    var message = '<html><head><title>504 Gateway Time-out</title></head>'+
+      '<body bgcolor="white">'+
+      '<center><h1>504 Gateway Time-out</h1></center>'+
+      '<hr>'+
+    '</body></html>';
+    res.send(504, message);
+    res.end();
 
-		// cancel any ongoing requests
-		proxy_request.abort();
+    // cancel any ongoing requests
+    proxy_request.abort();
   });
   if (req.method === 'POST'|| req.method === 'PATCH') {
-		proxy_request.write(proxy_request_body);
+    proxy_request.write(proxy_request_body);
   }
   proxy_request.end();
 };
