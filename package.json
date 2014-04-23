@@ -9,7 +9,8 @@
     "body-parser": "1.0.2",
     "morgan": "1.0.0",
     "cookie-parser": "1.0.1",
-    "node-bugsense": "0.0.2"
+    "node-bugsense": "0.0.2",
+    "connect-timeout": "1.0.0"
   },
   "devDependencies": {
     "grunt": "0.4.4",
