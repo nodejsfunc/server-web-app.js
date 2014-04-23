@@ -7,5 +7,6 @@ module.exports = {
 	options: require('./options'),
 	reverse: require('./reverse'),
 	user: require('./user'),
-	error: require('./error')
+	error: require('./error'),
+	notFound: require('./notFound')
 };

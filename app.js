@@ -25,10 +25,8 @@ app.use(middleware.requested);
 // Register routes
 app.use(constants.LOCAL_PATH, routes.local);
 app.use(constants.BASE_PATH, routes.services);
+app.use(middleware.notFound);
 app.use(middleware.error);
-app.use(function(req, res){ // 404 handler
-	res.send(404, 'Not found');
-});
 
 // Start server
 app.listen(port);
