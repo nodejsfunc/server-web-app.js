@@ -47,12 +47,6 @@ module.exports = function(req, res, next){
 		){
 			// change the content type
 			req.options.headers['content-type'] = req.headers.accept;
-			// send data as JSON string, not query string as the default
-			// to do do this
-			// proxy_request_body = JSON.stringify(req.body);
-			if(req.method === 'PATCH' || req.method === 'POST'){
-				// req.options.headers['content-length'] = Buffer.byteLength(proxy_request_body);
-			}
 		}
 	}
 
