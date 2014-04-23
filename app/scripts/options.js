@@ -5,7 +5,9 @@
  * This object will be used later, therefore it will be saved as part of the request.
  * */
 
-var config = require('./../config/config'), constants = require('./../config/constants');
+var config = require('./../config/config'),
+	constants = require('./../config/constants'),
+	extend = require('extend');
 
 module.exports = function(req, res, next){
 
@@ -13,7 +15,7 @@ module.exports = function(req, res, next){
 		return next('No path specified');
 	}
 
-	var domain = config.api_domains[req.params.domain], path = req.params[0], options = domain.options;
+	var domain = config.api_domains[req.params.domain], path = req.params[0], options = extend(true, {}, domain.options);
 
 	if (domain.hasOwnProperty('root') && domain.root.length > 0) {
 		// if there is a root, use this as the start of the URI
