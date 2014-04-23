@@ -1,9 +1,9 @@
 'use strict';
 
-var constants = require('./constants'),
-	config = require('./config'),
+var constants = require('./../config/constants'),
+	config = require('./../config/config'),
 	redis = require('redis').createClient(config.databasePort, config.databaseDomain),
-	bugsense = require('./bugsense');
+	bugsense = require('./../util/bugsense');
 
 redis.on('error', function redisError(error){
 	console.log('\u001b[31m', 'Redis error --> ', error, '\u001b[0m');

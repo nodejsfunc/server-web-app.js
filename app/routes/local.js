@@ -3,7 +3,7 @@
 var express = require('express'),
 	constants = require('./../config/constants'),
 	config = require('./../config/config'),
-	repository = require('./../config/repository'),
+	repository = require('./../util/repository'),
 	router = express.Router();
 
 router

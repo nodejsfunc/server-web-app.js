@@ -1,6 +1,7 @@
 'use strict';
 
-var constants = require('../config/constants'), bugsense = require('./../config/bugsense');
+var constants = require('../config/constants'),
+	bugsense = require('./../util/bugsense');
 
 module.exports = function(err, req, res, next){
 	if(!err){

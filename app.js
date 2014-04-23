@@ -10,7 +10,7 @@ var express = require('express'),
 	config = require('./app/config/config'),
 	middleware = require('./app/scripts'),
 	routes = require('./app/routes'),
-	bugsense = require('./app/config/bugsense');
+	bugsense = require('./app/util/bugsense');
 
 // Configure application
 var app = express();

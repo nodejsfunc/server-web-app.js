@@ -2,7 +2,7 @@
 
 var config = require('./../config/config'),
 	constants = require('./../config/constants'),
-	repository = require('./../config/repository'),
+	repository = require('./../util/repository'),
 	querystring = require('querystring');
 
 module.exports = function(req, res, next){
