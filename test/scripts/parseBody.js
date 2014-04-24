@@ -25,7 +25,7 @@ describe('Parse body', function(){
 		server.close();
 	});
 
-	it('should parse the body of the request sugin querystring', function(done){
+	it('should parse the body of the request using in querystring', function(done){
 		var body = {
 			some_body: 1
 		};
