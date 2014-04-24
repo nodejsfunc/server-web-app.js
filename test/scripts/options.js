@@ -7,6 +7,7 @@ var express = require('express'),
 	path = '/:domain/*',
 	extend = require('extend'),
 	should = require('should'),
+	cookie = 'some cookie',
 	request = require('supertest')('http://localhost:3000');
 
 describe('Options ', function(){
@@ -16,6 +17,10 @@ describe('Options ', function(){
 	beforeEach(function(){
 		var app = express();
 		app.use(cookieParser());
+		app.use(path, function(req, res, next){
+			req.cookies['access_token'] = cookie;
+			next();
+		});
 		app.use(path, middleware);
 		app.get(path, function(req, res){
 			res.send(200, req.options);
@@ -46,6 +51,11 @@ describe('Options ', function(){
 
 				// should include path
 				options.path = (config.api_domains[domain].root && '/' + config.api_domains[domain].root) + '/path';
+
+				// should transform cookie into auth header
+				if(options.port !== 80){
+					options.headers.Authorization = 'Bearer ' + cookie;
+				}
 
 				request
 					.get('/'+domain + '/path')
