@@ -3,6 +3,7 @@
 var config = require('./../config/config'),
 	constants = require('./../config/constants'),
 	repository = require('./../util/repository'),
+	extend = require('extend'),
 	querystring = require('querystring');
 
 module.exports = function(req, res, next){
@@ -24,8 +25,7 @@ module.exports = function(req, res, next){
 							grant_type: constants.AUTH_REFRESH_TOKEN_NAME
 						});
 						// Return user data from /oauth/token endpoint (workaround for /users/{id} requiring critical elevation):
-						// todo rebuild options from existing object in config
-						req.options = config.api_domains.auth.options;
+						req.options = extend(true, {}, config.api_domains.auth.options);
 						req.options.path = constants.REFRESH_TOKEN_PATH;
 						req.options.method = 'POST';
 						req.options.headers = {
