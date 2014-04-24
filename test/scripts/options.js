@@ -6,6 +6,7 @@ var express = require('express'),
 	cookieParser = require('cookie-parser'),
 	path = '/:domain/*',
 	extend = require('extend'),
+	should = require('should'),
 	request = require('supertest')('http://localhost:3000');
 
 describe('Options ', function(){
@@ -37,9 +38,6 @@ describe('Options ', function(){
 
 				// should have original request headers (default and custom)
 				options.headers = {
-					'accept-encoding': 'gzip, deflate',
-					connection: 'close',
-					origin: 'http://localhost:3000',
 					'x-custom-header': 1
 				};
 
@@ -52,7 +50,11 @@ describe('Options ', function(){
 				request
 					.get('/'+domain + '/path')
 					.set('x-custom-header', 1)
-					.expect(200, options, done);
+					.expect(200, function(err, res){
+						// check every property in options and verifies it against the response body
+						should(res.body).containDeep(options);
+						done();
+					});
 			});
 		})(domains[i]);
 	}
