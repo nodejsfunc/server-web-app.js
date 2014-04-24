@@ -14,18 +14,13 @@ var express = require('express'),
 
 router
 	.use(path, middleware.domain) // verifies that domain is valid
+	.use(path, middleware.parseBody) // creates options options to be used for proxy request
 	.use(path, middleware.options) // creates options options to be used for proxy request
 	.use(path, middleware.reverse) // reverses accept and content-type headers
 	.use(path, middleware.user) // handle special case of /users/ requests
 	.use(path, function(req, res){
-
 		// Make the proxy HTTP request
 		var proxy_scheme = req.options.port === 443 ? https : http;
-		var proxy_request_body;
-
-		if (req.method === 'POST' || req.method === 'PATCH') {
-			proxy_request_body = querystring.stringify(req.body);
-		}
 
 		// make proxy request
 		var _updateAccessToken = function(oldAT, newAT, obj){
@@ -150,7 +145,6 @@ router
 						onError(err);
 					}
 				});
-			request.end();
 			return request;
 		};
 
@@ -301,7 +295,7 @@ router
 		});
 
 		if (req.method === 'POST'|| req.method === 'PATCH') {
-			proxy_request.write(proxy_request_body);
+			proxy_request.write(req.body);
 		}
 		proxy_request.end();
 	});

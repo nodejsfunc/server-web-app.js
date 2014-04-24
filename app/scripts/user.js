@@ -19,10 +19,10 @@ module.exports = function(req, res, next){
 						// make request with user id
 						req.options.path = '/users/' + user_id;
 					} else {
-						req.body = {
+						req.body = querystring.stringify({
 							refresh_token: user_data.refresh_token,
 							grant_type: constants.AUTH_REFRESH_TOKEN_NAME
-						};
+						});
 						// Return user data from /oauth/token endpoint (workaround for /users/{id} requiring critical elevation):
 						// todo rebuild options from existing object in config
 						req.options = config.api_domains.auth.options;
@@ -30,7 +30,7 @@ module.exports = function(req, res, next){
 						req.options.method = 'POST';
 						req.options.headers = {
 							'Content-Type': 'application/x-www-form-urlencoded',
-							'Content-Length': Buffer.byteLength(querystring.stringify(req.body))
+							'Content-Length': Buffer.byteLength(req.body)
 						};
 						req.method = 'POST';
 					}

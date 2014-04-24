@@ -1,6 +1,8 @@
 'use strict';
 
-var constants = require('./../config/constants'), config = require('./../config/config');
+var constants = require('./../config/constants'),
+	config = require('./../config/config'),
+	querystring = require('querystring');
 
 module.exports = function(req, res, next){
 	// the bodyparser of express.js is unable to parse anything other than JSON or form parameters (req.body is empty)
@@ -47,6 +49,8 @@ module.exports = function(req, res, next){
 		){
 			// change the content type
 			req.options.headers['content-type'] = req.headers.accept;
+			// use json stringify instead of query stringify
+			req.body = JSON.stringify(querystring.parse(req.body));
 		}
 	}
 
