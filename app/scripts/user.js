@@ -7,7 +7,6 @@ var config = require('./../config/config'),
 	querystring = require('querystring');
 
 module.exports = function(req, res, next){
-	console.log('test');
 	if(req.options.host === config.api_domains.auth.options.host && req.method === 'GET' &&
 		(req.options.path === '/users' || req.options.path.substr(0, 7) === '/users?')){
 		if(req.cookies.hasOwnProperty(constants.AUTH_ACCESS_TOKEN_NAME)){
