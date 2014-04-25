@@ -3,7 +3,8 @@
 var constants = require('./../config/constants'),
 	config = require('./../config/config'),
 	redis = require('redis').createClient(config.databasePort, config.databaseDomain),
-	bugsense = require('./../util/bugsense');
+	bugsense = require('./../util/bugsense'),
+	Q = require('q');
 
 redis.on('error', function redisError(error){
 	console.log('\u001b[31m', 'Redis error --> ', error, '\u001b[0m');
@@ -20,52 +21,32 @@ module.exports = {
 		}
 	},
 	get: function(key){
-		var _onSuccess = null,
-			_onError = null,
-			_promise = {
-				then: function(onSuccess, onError){
-					_onSuccess = typeof onSuccess === 'function' ? onSuccess : null;
-					_onError = typeof onError === 'function' ? onError : null;
-					return _promise;
-				}
-			};
+		var defer = Q.defer();
+
 		redis.get(key, function(err, reply){
 			if(!err){
-				if(typeof _onSuccess === 'function'){
-					_onSuccess(reply);
-				}
+				defer.resolve(reply);
 			} else {
-				if(typeof _onError === 'function'){
-					_onError(err);
-				}
+				defer.reject(err);
 			}
 		});
-		return _promise;
+
+		return defer.promise;
 	},
 	del: function(key){
 		redis.del(key || null);
 	},
 	exists: function(key){
-		var _onSuccess = null,
-			_onError = null,
-			_promise = {
-				then: function(onSuccess, onError){
-					_onSuccess = typeof onSuccess === 'function' ? onSuccess : null;
-					_onError = typeof onError === 'function' ? onError : null;
-					return _promise;
-				}
-			};
+		var defer = Q.defer();
+
 		redis.exists(key, function(err, reply){
 			if(!err){
-				if(typeof _onSuccess === 'function'){
-					_onSuccess(reply);
-				}
+				defer.resolve(reply);
 			} else {
-				if(typeof _onError === 'function'){
-					_onError(err);
-				}
+				defer.reject(err);
 			}
 		});
-		return _promise;
+
+		return defer.promise;
 	}
 };
