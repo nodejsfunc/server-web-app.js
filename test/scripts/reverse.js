@@ -43,6 +43,17 @@ describe('Reverse', function(){
 		server.close();
 	});
 
+	it('should not reverse headers for all paths', function(done){
+		request
+			.post('/domain/random_path')
+			.set('accept', headers.accept)
+			.set('content-type', headers.type)
+			.expect(201, function(err, res){
+				should(res.body.headers['content-type']).not.be.exactly(headers.accept);
+				done();
+			});
+	});
+
 	for(var i = 0, l = paths.length; i < l; i++){
 		(function(path){
 			it('should reverse accept and content type header for ' + path, function(done){
