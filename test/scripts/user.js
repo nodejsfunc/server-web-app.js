@@ -1,28 +1,14 @@
 'use strict';
 
 var express = require('express'),
-	proxyquire = require('proxyquire').noCallThru(),
 	config = require('../../app/config/config'),
 	cookieParser = require('cookie-parser'),
 	Q = require('q'),
 	should = require('should'),
 	querystring = require('querystring'),
 	constants = require('../../app/config/constants'),
-	userMock = {
-		refresh_token: 'refresh_token',
-		user_id: 1
-	},
-	user = proxyquire('../../app/scripts/user', {
-		'./../util/repository': {
-			get: function(){
-				var defer = Q.defer();
-
-				defer.resolve(JSON.stringify(userMock));
-
-				return defer.promise;
-			}
-		}
-	}),
+	mocks = require('../mocks'),
+	user = require('../../app/scripts/user'),
 	request = require('supertest')('http://localhost:3000');
 
 describe('User request', function(){
@@ -61,7 +47,7 @@ describe('User request', function(){
 				var response = res.body;
 
 				var body = querystring.stringify({
-						refresh_token: userMock.refresh_token,
+						refresh_token: mocks.USER.refresh_token,
 						grant_type: constants.AUTH_REFRESH_TOKEN_NAME
 					}),
 					options = {
@@ -87,7 +73,7 @@ describe('User request', function(){
 			.get('/')
 			.query({'no-cache': 1})
 			.expect(200, function(err, res){
-				should(res.body.options.path).be.exactly('/users/' + userMock.user_id);
+				should(res.body.options.path).be.exactly('/users/' + mocks.USER.user_id);
 				done();
 			});
 	});
