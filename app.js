@@ -40,7 +40,7 @@ if (global.newRelicKey !== '') {
  * Bugsense configuration
  *
  */
-global.bugsense = require(process.cwd()+'/public/javascripts/bugsense');
+global.bugsense = require('./public/javascripts/bugsense');
 if (global.bugsenseKey) {
   global.bugsense.setAPIKey(global.bugsenseKey);
 
