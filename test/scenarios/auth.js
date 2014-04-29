@@ -8,7 +8,6 @@ var express = require('express'),
 	routes = require('../../app/routes'),
 	mocks = require('../mocks'),
 	nock = require('nock'),
-	path = 'path',
 	querystring = require('querystring'),
 	should = require('should'),
 	request = require('supertest')('http://localhost:3000');
