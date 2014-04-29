@@ -9,6 +9,7 @@ var express = require('express'),
 	router = express.Router(),
 	http = require('http'),
 	https = require('https'),
+	extend = require('extend'),
 	querystring = require('querystring'),
 	path = '/:domain/*';
 
@@ -130,7 +131,7 @@ router
 		 * @private
 		 */
 		var _request = function(options, onSuccess, onError, cookie){
-			var request = proxy_scheme.request(options, function(proxy_response){
+			var request = proxy_scheme.request(extend({}, options), function(proxy_response){
 				if(res.headersSent){
 					return;
 				}
