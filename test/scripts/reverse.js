@@ -54,19 +54,21 @@ describe('Reverse', function(){
 			});
 	});
 
+	var _test = function (path) {
+		it('should reverse accept and content type header for ' + path, function (done) {
+			request
+				.post('/domain/' + path)
+				.set('accept', headers.accept)
+				.set('content-type', headers.type)
+				.expect(201, function (err, res) {
+					should(res.body.headers['content-type']).be.exactly(headers.accept);
+					done();
+				});
+		});
+	};
+
 	for(var i = 0, l = paths.length; i < l; i++){
-		(function(path){
-			it('should reverse accept and content type header for ' + path, function(done){
-				request
-					.post('/domain/' + path)
-					.set('accept', headers.accept)
-					.set('content-type', headers.type)
-					.expect(201, function(err, res){
-						should(res.body.headers['content-type']).be.exactly(headers.accept);
-						done();
-					});
-			});
-		})(paths[i]);
+		_test(paths[i]);
 	}
 
 });

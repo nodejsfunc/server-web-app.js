@@ -1,14 +1,14 @@
 'use strict';
 
 var express = require('express'),
-	middleware = require('../../app/routes/local'),
 	constants = require('../../app/config/constants'),
 	config = require('../../app/config/config'),
 	should = require('should'),
 	cookieParser = require('cookie-parser'),
 	routes = require('../../app/routes'),
 	request = require('supertest')('http://localhost:3000');
-	describe('Local routing', function(){
+
+describe('Local routing', function(){
 
 	var server;
 

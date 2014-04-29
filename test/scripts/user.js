@@ -3,7 +3,6 @@
 var express = require('express'),
 	config = require('../../app/config/config'),
 	cookieParser = require('cookie-parser'),
-	Q = require('q'),
 	should = require('should'),
 	querystring = require('querystring'),
 	constants = require('../../app/config/constants'),
@@ -23,7 +22,7 @@ describe('User request', function(){
 				host: config.api_domains.auth.options.host,
 				path: '/users'
 			};
-			req.cookies['access_token'] = 'some token';
+			req.cookies.access_token = 'some token';
 			next();
 		});
 		app.use(user);

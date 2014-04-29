@@ -16,7 +16,7 @@ describe('Parse body', function(){
 		app.use(bodyParser());
 		app.use(middleware);
 		app.post(path, function(req, res){
-			res.send(200, req.body)
+			res.send(200, req.body);
 		});
 		server = app.listen(3000);
 	});

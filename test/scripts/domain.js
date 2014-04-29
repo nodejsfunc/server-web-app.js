@@ -28,14 +28,16 @@ describe('Domain', function(){
 			.expect(404, done);
 	});
 
+	var _test = function(domain){
+		it('should accept connections for /' + domain + '/path', function(done){
+			request
+				.get('/' + domain + '/path')
+				.expect(200, done);
+		});
+	};
+
 	for(var i = 0, l = domains.length; i < l; i++){
-		(function(domain){
-			it('should accept connections for /' + domain + '/path', function(done){
-				request
-					.get('/' + domain + '/path')
-					.expect(200, done);
-			});
-		})(domains[i]);
+		_test(domains[i]);
 	}
 
 });

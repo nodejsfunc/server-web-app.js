@@ -97,7 +97,8 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('build', [
-    'jshint'
+    'jshint',
+		'mochaTest'
   ]);
 
   grunt.registerTask('ci-build', [
