@@ -259,11 +259,15 @@ router
 									req.options.headers.Authorization = 'Bearer '+ new_access_token;
 
 									// redo the request
-									_request(req.options, _parseResponse, _errorHandler, {
+									var new_request = _request(req.options, _parseResponse, _errorHandler, {
 										name: constants.AUTH_ACCESS_TOKEN_NAME,
 										value: new_access_token,
 										prop: { expires: expiresDate, path: '/api', httpOnly: true, secure: true }
 									});
+									if (req.method === 'POST'|| req.method === 'PATCH') {
+										new_request.write(req.body);
+									}
+									new_request.end();
 								}, function(){
 									// refresh token invalid, send back result as is
 									_parseResponse(proxy_response);
