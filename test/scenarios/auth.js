@@ -59,12 +59,39 @@ describe('Auth', function(){
 
 		request
 			.post('/auth' + constants.REFRESH_TOKEN_PATH)
-			.expect('set-cookie', new RegExp(querystring.stringify({access_token: mocks.TOKEN_RESPONSE.access_token})+'; Path=\/api;'))
+			.expect('set-cookie', new RegExp(querystring.stringify({access_token: mocks.TOKEN_RESPONSE.access_token})+'; Path=\/api; HttpOnly; Secure'))
 			.expect(200, done);
 	});
 
-	it('should set expiry date based on remember me option', function(){
+	it('should set expiry date as session', function(done){
+		nock('https://' + auth.options.host)
+			.post(constants.REFRESH_TOKEN_PATH)
+			.matchHeader('Authorization', 'Bearer some token')
+			.reply(200, mocks.TOKEN_RESPONSE);
 
+		// When an expiry date or validity interval is not set at cookie creation time, a session cookie is created
+		request
+			.post('/auth' + constants.REFRESH_TOKEN_PATH)
+			.expect('set-cookie', new RegExp(querystring.stringify({access_token: mocks.TOKEN_RESPONSE.access_token})+'; Path=\/api; HttpOnly; Secure'))
+			.expect(200, done);
+	});
+
+	it('should set expiry date at MAX', function(done){
+		nock('https://' + auth.options.host)
+			.post(constants.REFRESH_TOKEN_PATH)
+			.matchHeader('Authorization', 'Bearer some token')
+			.reply(200, mocks.TOKEN_RESPONSE);
+
+		var param = {}, date = new Date(Date.now() + constants.AUTH_MAX_AGE);
+		param[constants.AUTH_PARAM_REMEMBER_ME] = true;
+
+		// since the date is calculated at runtime, we cannot assert the date precisely since we do not know exactly when the response returns
+		// since AUTH_MAX_AGE represents two weeks, we only check that the date is two weeks in the future (ignoring the time component)
+		request
+			.post('/auth' + constants.REFRESH_TOKEN_PATH)
+			.query(param)
+			.expect('set-cookie', new RegExp(querystring.stringify({access_token: mocks.TOKEN_RESPONSE.access_token})+'; Path=\/api; Expires='+date.toUTCString().replace(/\d\d:\d\d:\d\d/, '\\d\\d:\\d\\d:\\d\\d')+'; HttpOnly; Secure'))
+			.expect(200, done);
 	});
 
 });

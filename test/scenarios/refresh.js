@@ -60,7 +60,7 @@ describe('Handle 401', function(){
 				// all this happens in one request
 				request
 					.get('/' + domain + '/' + path)
-					.expect('set-cookie', new RegExp(querystring.stringify({access_token: mocks.TOKEN_RESPONSE.access_token})+'; Path=\/api;'))
+					.expect('set-cookie', new RegExp(querystring.stringify({access_token: mocks.TOKEN_RESPONSE.access_token})+'; Path=\/api; HttpOnly; Secure'))
 					.expect(200, done);
 
 			});
