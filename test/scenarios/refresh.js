@@ -9,6 +9,7 @@ var express = require('express'),
 	mocks = require('../mocks'),
 	nock = require('nock'),
 	path = 'path',
+	querystring = require('querystring'),
 	request = require('supertest')('http://localhost:3000');
 
 describe('Handle 401', function(){
@@ -48,17 +49,18 @@ describe('Handle 401', function(){
 				// when attempting to refresh the token, return a new token
 				nock('https://' + config.api_domains.auth.options.host)
 					.post(constants.REFRESH_TOKEN_PATH)
-					.reply(200, mocks.REFRESH);
+					.reply(200, mocks.TOKEN_RESPONSE);
 
 				// second request with new access token gets a 200
 				nock('https://' + api.options.host)
 					.get(test)
-					.matchHeader('Authorization', 'Bearer ' + mocks.REFRESH.access_token)
+					.matchHeader('Authorization', 'Bearer ' + mocks.TOKEN_RESPONSE.access_token)
 					.reply(200);
 
 				// all this happens in one request
 				request
 					.get('/' + domain + '/' + path)
+					.expect('set-cookie', new RegExp(querystring.stringify({access_token: mocks.TOKEN_RESPONSE.access_token})+'; Path=\/api;'))
 					.expect(200, done);
 
 			});
