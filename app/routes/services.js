@@ -14,7 +14,6 @@ var express = require('express'),
 
 router
 	.use(path, middleware.domain) // verifies that domain is valid
-	.use(path, middleware.parseBody) // creates options options to be used for proxy request
 	.use(path, middleware.options) // creates options options to be used for proxy request
 	.use(path, middleware.reverse) // reverses accept and content-type headers
 	.use(path, middleware.user) // handle special case of /users/ requests

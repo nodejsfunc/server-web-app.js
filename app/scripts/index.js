@@ -8,6 +8,5 @@ module.exports = {
 	reverse: require('./reverse'),
 	user: require('./user'),
 	error: require('./error'),
-	notFound: require('./notFound'),
-	parseBody: require('./parseBody')
+	notFound: require('./notFound')
 };
