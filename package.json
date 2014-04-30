@@ -10,10 +10,10 @@
     "cookie-parser": "1.0.1",
     "node-bugsense": "0.0.2",
     "connect-timeout": "1.0.0",
-    "extend": "^1.2.1",
+    "extend": "1.2.1",
 		"body-parser": "1.0.2",
 		"connect-timeout": "1.0.0",
-    "q": "^1.0.1"
+    "q": "1.0.1"
   },
   "devDependencies": {
     "grunt": "0.4.4",
