@@ -49,6 +49,7 @@ describe('Reverse', function(){
 			.set('accept', headers.accept)
 			.set('content-type', headers.type)
 			.expect(201, function(err, res){
+				should.not.exist(err);
 				should(res.body.headers['content-type']).not.be.exactly(headers.accept);
 				done();
 			});
@@ -61,6 +62,7 @@ describe('Reverse', function(){
 				.set('accept', headers.accept)
 				.set('content-type', headers.type)
 				.expect(201, function (err, res) {
+					should.not.exist(err);
 					should(res.body.headers['content-type']).be.exactly(headers.accept);
 					done();
 				});

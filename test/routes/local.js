@@ -27,6 +27,7 @@ describe('Local routing', function(){
 		request
 			.get(constants.LOCAL_PATH + constants.CLIENT_CONFIG_PATH)
 			.expect(200, function(err, res){
+				should.not.exist(err);
 				should(res.body).containDeep(config.clientConfig);
 				done();
 			});

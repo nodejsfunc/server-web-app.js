@@ -60,6 +60,7 @@ describe('User request', function(){
 						method: 'POST'
 					};
 
+				should.not.exist(err);
 				should(response.options).containDeep(options);
 				should(response.body).containDeep(body);
 
@@ -72,6 +73,7 @@ describe('User request', function(){
 			.get('/')
 			.query({'no-cache': 1})
 			.expect(200, function(err, res){
+				should.not.exist(err);
 				should(res.body.options.path).be.exactly('/users/' + mocks.USER.user_id);
 				done();
 			});
