@@ -38,10 +38,7 @@ module.exports = function (grunt) {
           src: [
             'package.json',
             'app.js',
-            'config/**/*',
-            'public/**/*',
-            'routes/**/*',
-            'views/**/*',
+            'app/**/*',
             'node_modules/**/*',
             '!node_modules/grunt*/**',
             '!node_modules/jit-grunt/**'
