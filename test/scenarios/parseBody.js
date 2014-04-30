@@ -6,8 +6,6 @@ var express = require('express'),
 	config = require('../../app/config/config'),
 	constants = require('../../app/config/constants'),
 	reverse = require('../../app/scripts/reverse'),
-	mocks = require('../mocks'),
-	nock = require('nock'),
 	paths = [
 		constants.CREDIT_CARD_PATH,
 		constants.BASKET_PATH,
@@ -21,7 +19,6 @@ var express = require('express'),
 		test: 1
 	},
 	querystring = require('querystring'),
-	should = require('should'),
 	request = require('supertest')('http://localhost:3000');
 
 describe('Parse body', function(){

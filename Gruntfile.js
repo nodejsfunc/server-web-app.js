@@ -104,7 +104,8 @@ module.exports = function (grunt) {
   grunt.registerTask('ci-build', [
     'clean:dist',
     'jshint',
-    'copy',
+		'mochaTest',
+		'copy',
     'update-version'
   ]);
 
