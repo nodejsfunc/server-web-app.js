@@ -78,7 +78,7 @@ module.exports = function (grunt) {
 					// NNB. As mocha is 'clever' enough to only run the tests once for
 					// each file the following coverage task does not actually run any
 					// tests which is why the coverage instrumentation has to be done here
-					require: 'coverage/blanket'
+					require: 'blanket'
 				},
 				src: ['test/**/*.js']
 			},
