@@ -54,6 +54,7 @@ module.exports = function(req, res, next){
 		} else {
 			req.body = querystring.stringify(req.body);
 		}
+		req.options.headers['content-length'] = Buffer.byteLength(req.body || '');
 	}
 
 	next();
