@@ -9,7 +9,7 @@ module.exports = function(req, res, next){
 	// to enable custom content-types, that send raw data, we must set the accept header to the desired content-type (set by the request in Accept)
 	// this app will replace the content type AFTER the bodyparser received the data in req.body
 	// this is only required for POST/PATCH/DELETE
-	if(req.method !== 'GET'){
+	if(/^(POST|PATCH|PUT)$/.test(req.method)){
 		var _isCreditCardService = function(){
 			return req.options.path.indexOf(constants.CREDIT_CARD_PATH) === 0;
 		};
