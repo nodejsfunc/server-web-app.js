@@ -76,13 +76,13 @@ describe('Auth', function(){
 	});
 
 	it('should set expiry date at MAX', function(done){
-		nock('https://' + auth.options.host)
-			.post(constants.REFRESH_TOKEN_PATH)
+    var param = {}, date = new Date(Date.now() + constants.AUTH_MAX_AGE);
+    param[constants.AUTH_PARAM_REMEMBER_ME] = true;
+
+    nock('https://' + auth.options.host)
+			.post(constants.REFRESH_TOKEN_PATH + '?' + querystring.stringify(param))
 			.matchHeader('Authorization', 'Bearer some token')
 			.reply(200, mocks.TOKEN_RESPONSE);
-
-		var param = {}, date = new Date(Date.now() + constants.AUTH_MAX_AGE);
-		param[constants.AUTH_PARAM_REMEMBER_ME] = true;
 
 		// since the date is calculated at runtime, we cannot assert the date precisely since we do not know exactly when the response returns
 		// since AUTH_MAX_AGE represents two weeks, we only check that the date is two weeks in the future (ignoring the time component)
