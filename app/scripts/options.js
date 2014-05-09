@@ -12,7 +12,8 @@ var config = require('./../config/config'),
 
 module.exports = function(req, res, next){
 
-  var params = url.parse(req.url).query; // request.query is encoding the string parameters and the url is not correct
+  // Making use of url.parse to retrieve the query params instead of  just using req.query, as the latter encodes the string parameters, but we need the query string unencoded
+  var params = url.parse(req.url).query;
 
   if(!req.params || !req.params[0]){
     return next('No path specified');
