@@ -10,13 +10,13 @@
       "universal": "UA-44875536-3",
       "domain": "nodejs-internal.mobcastdev.com"
     },
-		"nonSecureServicesDomain": "qa.mobcastdev.com"
+		"nonSecureServicesDomain": "api.blinkboxbooks.com"
 	},
   "domains": {
     "service": {
       "root": "service",
       "options": {
-        "host": "qa.mobcastdev.com",
+        "host": "api.blinkboxbooks.com",
         "port": 80,
         "headers": {
         }
@@ -25,7 +25,7 @@
     "secure-service": {
       "root": "service",
       "options": {
-        "host": "qa.mobcastdev.com",
+        "host": "api.blinkboxbooks.com",
         "port": 443,
         "headers": {
         }
@@ -34,7 +34,7 @@
     "auth": {
       "root": "",
       "options": {
-        "host":   "auth.mobcastdev.com",
+        "host":   "auth.blinkboxbooks.com",
         "port":   443,
         "headers": {
         }
@@ -43,7 +43,7 @@
     "resource": {
       "root": "",
       "options": {
-        "host": "internal-media.mobcastdev.com",
+        "host": "media.blinkboxbooks.com",
         "port": 80,
         "headers": {
         }
