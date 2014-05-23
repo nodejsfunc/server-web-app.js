@@ -10,13 +10,13 @@
       "universal": "UA-44875536-3",
       "domain": "nodejs-internal.mobcastdev.com"
     },
-		"nonSecureServicesDomain": "api.blinkboxbooks.com"
+		"nonSecureServicesDomain": "origin-api.blinkboxbooks.com"
 	},
   "domains": {
     "service": {
       "root": "service",
       "options": {
-        "host": "api.blinkboxbooks.com",
+        "host": "origin-api.blinkboxbooks.com",
         "port": 80,
         "headers": {
         }
@@ -25,7 +25,7 @@
     "secure-service": {
       "root": "service",
       "options": {
-        "host": "api.blinkboxbooks.com",
+        "host": "origin-api.blinkboxbooks.com",
         "port": 443,
         "headers": {
         }
