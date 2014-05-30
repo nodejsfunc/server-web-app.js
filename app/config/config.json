@@ -25,7 +25,7 @@
     "secure-service": {
       "root": "service",
       "options": {
-        "host": "api.blinkboxbooks.com",
+        "host": "origin-api.blinkboxbooks.com",
         "port": 443,
         "headers": {
         }
