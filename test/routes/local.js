@@ -16,7 +16,7 @@ describe('Local routing', function(){
 		var app = express();
 		app.use(cookieParser());
 		app.use(constants.LOCAL_PATH, routes.local);
-		server = app.listen(3000);
+		server = app.listen(3005);
 	});
 
 	afterEach(function(){
