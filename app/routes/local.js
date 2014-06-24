@@ -17,7 +17,6 @@ router
 		res.clearCookie(constants.AUTH_ACCESS_TOKEN_NAME, { path: '/api' });
 
 		res.send(200, null);
-		res.end();
 	})
 	.get(constants.CLIENT_CONFIG_PATH, function(req, res){
 		res.send(200, config.clientConfig);
