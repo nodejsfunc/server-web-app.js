@@ -28,7 +28,7 @@ router
       }, function(e){
         res.send(500, e);
       });
-    }, function(e){
+    }, function(){
       res.send(500);
     });
 	})
