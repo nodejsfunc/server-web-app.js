@@ -61,6 +61,7 @@ describe('Local routing', function(){
 		request
 			.get(constants.LOCAL_PATH + constants.SIGN_OUT_PATH)
       .set('Cookie', 'access_token=something-that-is-real-irl')
+      .expect('set-cookie', /access_token=; Path=\/api;/)
 			.expect(200, done);
 	});
 
