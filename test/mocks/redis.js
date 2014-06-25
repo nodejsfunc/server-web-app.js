@@ -16,7 +16,12 @@ var redis = {
 		return {
 			on: function(){},
 			get: function(key, cb){
+
 				setTimeout(function(){
+          if (key === 'does-not-exist') {
+            cb({error: 'Key does not exist.'});
+          }
+
 					cb(null, JSON.stringify(mocks.USER));
 				}, 0);
 			},

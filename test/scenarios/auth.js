@@ -33,7 +33,6 @@ describe('Auth', function(){
 	});
 
 	it('should remove tokens from response', function(done){
-
 		nock('https://' + auth.options.host)
 			.post(constants.REFRESH_TOKEN_PATH)
 			.matchHeader('Authorization', 'Bearer some token')

@@ -24,7 +24,7 @@ module.exports = {
 		var defer = Q.defer();
 
 		redis.get(key, function(err, reply){
-			if(!err){
+			if(! err){
 				defer.resolve(reply);
 			} else {
 				defer.reject(err);

@@ -6,17 +6,31 @@ var express = require('express'),
 	repository = require('./../util/repository'),
 	router = express.Router();
 
+var auth = require('./../services/auth');
+
 router
 	.get(constants.SIGN_OUT_PATH, function(req, res){
 		var access_token = req.cookies[constants.AUTH_ACCESS_TOKEN_NAME];
 
-		// delete token from redis repository
-		repository.del(access_token);
+    if (access_token === undefined) {
+      res.send(400, {error: 'We need the access token cookie to be set.'});
+    }
 
-		// delete cookie in browser
-		res.clearCookie(constants.AUTH_ACCESS_TOKEN_NAME, { path: '/api' });
+    repository.get(access_token).then(function(data){
+      data = JSON.parse(data);
 
-		res.send(200, null);
+      auth.revokeRefreshToken(data.refresh_token).then(function(){
+        repository.del(access_token);
+
+        res.clearCookie(constants.AUTH_ACCESS_TOKEN_NAME, { path: '/api' });
+
+        res.send(200, null);
+      }, function(e){
+        res.send(500, e);
+      });
+    }, function(e){
+      res.send(500);
+    });
 	})
 	.get(constants.CLIENT_CONFIG_PATH, function(req, res){
 		res.send(200, config.clientConfig);
