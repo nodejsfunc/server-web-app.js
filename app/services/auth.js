@@ -26,7 +26,7 @@ module.exports = {
           return deferred.resolve();
         }
 
-        return deferred.reject(JSON.parse(res.body));
+        return deferred.reject();
       });
 
     return deferred.promise;
