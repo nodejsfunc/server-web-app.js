@@ -4,13 +4,10 @@ var config = require('./../config/config');
 var constants = require('../../app/config/constants');
 var Q = require('q');
 var request = require('request');
-var extend = require('extend');
 
 function revokeRefreshTokenURL(){
-  var scheme = 'http';
   var port = config.api_domains.auth.options.port;
-
-  (port === 443) ? scheme = 'https' : scheme = 'http';
+  var scheme = (port === 443) ? 'https' : 'http';
 
   return scheme + '://' + config.api_domains.auth.options.host + ':' + port + constants.REVOKE_REFRESH_TOKEN;
 }

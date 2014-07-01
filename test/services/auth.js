@@ -1,21 +1,14 @@
 'use strict';
 
-var constants = require('../../app/config/constants'),
-    config = require('../../app/config/config'),
-    nock = require('nock');
+var constants = require('../../app/config/constants');
+var nock = require('nock');
 
+var config = require('../../app/config/config');
 var auth = require('../../app/services/auth');
-var extend = require('extend');
 
 describe('Auth service module', function(){
-  var originalConfig;
-
-  before(function(){
-    originalConfig = extend({}, config);
-  });
-
-  afterEach(function(){
-    config = originalConfig;
+  beforeEach(function(){
+    config.api_domains.auth.options.port = 443;
   });
 
   it('sends a HTTP request to revoke the access token', function(done){
@@ -23,7 +16,7 @@ describe('Auth service module', function(){
       .post(constants.REVOKE_REFRESH_TOKEN)
       .reply(200);
 
-    auth.revokeRefreshToken('some-token-which-is-nonsense').then(function(){
+    auth.revokeRefreshToken('a-valid-token').then(function(){
       authServer.done();
       done();
     });
@@ -44,7 +37,33 @@ describe('Auth service module', function(){
         .post(constants.REVOKE_REFRESH_TOKEN)
         .reply(200);
 
-    auth.revokeRefreshToken('a-valid-token', config).then(function(){
+    auth.revokeRefreshToken('a-valid-token').then(function(){
+      authServer.done();
+      done();
+    });
+  });
+
+  it('set the protocol correctly when we have a non-HTTPS port', function(done){
+    config.api_domains.auth.options.port = 80;
+
+    var authServer = nock('http://' + config.api_domains.auth.options.host)
+        .post(constants.REVOKE_REFRESH_TOKEN)
+        .reply(200);
+
+    auth.revokeRefreshToken('a-valid-token').then(function(){
+      authServer.done();
+      done();
+    });
+  });
+
+  it('sets the protocol correctly when we have a HTTPS port', function(done){
+    config.api_domains.auth.options.port = 443;
+
+    var authServer = nock('https://' + config.api_domains.auth.options.host)
+        .post(constants.REVOKE_REFRESH_TOKEN)
+        .reply(200);
+
+    auth.revokeRefreshToken('a-valid-token').then(function(){
       authServer.done();
       done();
     });
