@@ -13,11 +13,7 @@ function revokeRefreshTokenURL(){
 }
 
 module.exports = {
-  revokeRefreshToken: function(refresh_token, overideConfig){
-    if (typeof(overideConfig) !== 'undefined') {
-      config = overideConfig;
-    }
-
+  revokeRefreshToken: function(refresh_token){
     var deferred = Q.defer();
 
     request.post({
