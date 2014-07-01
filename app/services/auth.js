@@ -4,13 +4,23 @@ var config = require('./../config/config');
 var constants = require('../../app/config/constants');
 var Q = require('q');
 var request = require('request');
+var extend = require('extend');
 
 function revokeRefreshTokenURL(){
-  return 'https://' + config.api_domains.auth.options.host + constants.REVOKE_REFRESH_TOKEN;
+  var scheme = 'http';
+  var port = config.api_domains.auth.options.port;
+
+  (port === 443) ? scheme = 'https' : scheme = 'http';
+
+  return scheme + '://' + config.api_domains.auth.options.host + ':' + port + constants.REVOKE_REFRESH_TOKEN;
 }
 
 module.exports = {
-  revokeRefreshToken: function(refresh_token){
+  revokeRefreshToken: function(refresh_token, overideConfig){
+    if (typeof(overideConfig) !== 'undefined') {
+      config = overideConfig;
+    }
+
     var deferred = Q.defer();
 
     request.post({
