@@ -213,14 +213,12 @@ router
 			}
 			var msg = { error: e.message.replace(/\"/g, '') };      // strip any double quotes TODO: should handle single quotes too
 			var response = JSON.stringify(msg);
-			console.log('error', msg); //uncomment to see error message
 			res.set('Content-Type', 'application/json');
 			res.set('Content-length', Buffer.byteLength(response));
 			res.send(500, response);
 			res.end();
 		};
 
-		// console.log(options, proxy_request_body, req.body);
 		// make request on behalf of the website
 		var proxy_request = _request(req.options,
 			// on success
@@ -229,7 +227,7 @@ router
 				if(res.headersSent){
 					return;
 				}
-				// console.log('response', proxy_response.statusCode);
+
 				// if token invalid/expired
 				var error_message = proxy_response.headers['www-authenticate'] || '';
 				if(proxy_response.statusCode === 401 && (error_message.indexOf(constants.INVALID_TOKEN) !== -1 || error_message.indexOf(constants.EXPIRED_TOKEN) !== -1)){

@@ -14,6 +14,7 @@ module.exports = {
 	BBB_CONTENT_TYPE : 'application/vnd.blinkboxbooks.data',
 	AUTH_MAX_AGE : 1000*60*60*24*14, // 14 days
 	REFRESH_TOKEN_PATH: '/oauth2/token',
+  REVOKE_REFRESH_TOKEN: '/tokens/revoke',
 	LOCAL_PATH : '/api/local',
 	SIGN_OUT_PATH : '/signout',
 	BASE_PATH: '/api',
