@@ -87,8 +87,10 @@ router
 								var user_id = json_response.user_id.split(':');
 								user_id = user_id[user_id.length - 1];
 
-								// handle persistent and non-persistent authentication
-								var expiresDate = req.param(constants.AUTH_PARAM_REMEMBER_ME) === 'true' ? new Date(Date.now() + constants.AUTH_MAX_AGE) : null;
+                var body = querystring.parse(req.body) || {};
+
+                // handle persistent and non-persistent authentication
+								var expiresDate = body[constants.AUTH_PARAM_REMEMBER_ME] === 'true' ? new Date(Date.now() + constants.AUTH_MAX_AGE) : null;
 
 								res.cookie(constants.AUTH_ACCESS_TOKEN_NAME, access_token, { path: '/api', expires: expiresDate, httpOnly: true, secure: true });
 

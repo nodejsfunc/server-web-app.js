@@ -80,7 +80,7 @@ describe('Auth', function(){
     param[constants.AUTH_PARAM_REMEMBER_ME] = true;
 
     nock('https://' + auth.options.host)
-			.post(constants.REFRESH_TOKEN_PATH + '?' + querystring.stringify(param))
+			.post(constants.REFRESH_TOKEN_PATH, querystring.stringify(param))
 			.matchHeader('Authorization', 'Bearer some token')
 			.reply(200, mocks.TOKEN_RESPONSE);
 
@@ -88,7 +88,7 @@ describe('Auth', function(){
 		// since AUTH_MAX_AGE represents two weeks, we only check that the date is two weeks in the future (ignoring the time component)
 		request
 			.post('/auth' + constants.REFRESH_TOKEN_PATH)
-			.query(param)
+			.send(param)
 			.expect('set-cookie', new RegExp(querystring.stringify({access_token: mocks.TOKEN_RESPONSE.access_token})+'; Path=\/api; Expires='+date.toUTCString().replace(/\d\d:\d\d:\d\d/, '\\d\\d:\\d\\d:\\d\\d')+'; HttpOnly; Secure'))
 			.expect(200, done);
 	});
