@@ -21,7 +21,7 @@ var merchant_arg = process.argv.indexOf('-merchantKey'),
 	};
 
 // bugsense api key is hard-coded for live, until ops adds the command line param
-result.clientConfig.bugsenseKey = !result.clientConfig.bugsenseKey && result.clientConfig.nonSecureServicesDomain === 'api.blinkboxbooks.com' ? '9fa7c727' : result.clientConfig.bugsenseKey;
+// disabled, see CWA-1659 result.clientConfig.bugsenseKey = !result.clientConfig.bugsenseKey && result.clientConfig.nonSecureServicesDomain === 'api.blinkboxbooks.com' ? '9fa7c727' : result.clientConfig.bugsenseKey;
 result.bugsenseKey = !result.bugsenseKey && result.clientConfig.nonSecureServicesDomain === 'api.blinkboxbooks.com'? '649f61e5': '';
 
 module.exports = result;
