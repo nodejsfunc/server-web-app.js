@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.tmp/
+.sass-cache/
+.editorconfig
+.idea
+/styles/main.css
+app/scripts/config/constants.js
+app/locales/**/*.js
+app/locales/**/*.csv
+test/config/constants.js
+test/wraith/shots/**/
+app/components/
+coverage/
+
+# OSX-specific
+.DS_Store
