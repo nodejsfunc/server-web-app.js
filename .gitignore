@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.tmp/
+.editorconfig
+.idea
+
+# OSX-specific
+.DS_Store
