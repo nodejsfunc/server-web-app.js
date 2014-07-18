@@ -5,7 +5,7 @@ var package_json = require('./../../package.json');
 module.exports = {
 	APP_NAME: package_json.name,
 	APP_VERSION: package_json.version,
-	TOKEN_STORAGE_VERSION : '2.0.0',
+	TOKEN_STORAGE_VERSION : '3.0.0',
 	AUTH_ACCESS_TOKEN_NAME : 'access_token',
 	AUTH_REFRESH_TOKEN_NAME : 'refresh_token',
 	AUTH_PATH_COMPONENT : 'oauth2',

@@ -90,7 +90,8 @@ router
                 var body = querystring.parse(req.body) || {};
 
                 // handle persistent and non-persistent authentication
-								var expiresDate = body[constants.AUTH_PARAM_REMEMBER_ME] === 'true' ? new Date(Date.now() + constants.AUTH_MAX_AGE) : null;
+								var expires = body[constants.AUTH_PARAM_REMEMBER_ME] === 'true' ? Date.now() + constants.AUTH_MAX_AGE : undefined;
+								var expiresDate = expires ? new Date(expires) : null;
 
 								res.cookie(constants.AUTH_ACCESS_TOKEN_NAME, access_token, { path: '/api', expires: expiresDate, httpOnly: true, secure: true });
 
@@ -98,7 +99,7 @@ router
 								_updateAccessToken(req.cookies[constants.AUTH_ACCESS_TOKEN_NAME], access_token, {
 									refresh_token: refresh_token,
 									user_id: user_id,
-									remember_me: expiresDate !== null
+									expires: expires
 								});
 
 								// Strip the access and refresh tokens from the response body:
@@ -239,20 +240,17 @@ router
 							try{
 								var obj = JSON.parse(value),
 									refresh_token = obj.refresh_token,
-									remember_me = !!obj.remember_me, // convert remember_me to its boolean value
+									expires = obj.expires,
 									user_id = obj.user_id;
 								// get new access token
 								_refreshToken(refresh_token, function(result){
 									var new_access_token = result.access_token;
 
-									// set expiry date
-									var expiresDate = remember_me ? new Date(Date.now() + constants.AUTH_MAX_AGE) : null;
-
 									// save new access token
 									_updateAccessToken(access_token, new_access_token, {
 										refresh_token: refresh_token,
 										user_id: user_id,
-										remember_me: expiresDate !== null
+										expires: expires
 									});
 
 									// update authorization
@@ -262,7 +260,7 @@ router
 									var new_request = _request(req.options, _parseResponse, _errorHandler, {
 										name: constants.AUTH_ACCESS_TOKEN_NAME,
 										value: new_access_token,
-										prop: { expires: expiresDate, path: '/api', httpOnly: true, secure: true }
+										prop: { expires: expires ? new Date(expires) : null, path: '/api', httpOnly: true, secure: true }
 									});
 									if (req.method === 'POST'|| req.method === 'PATCH') {
 										new_request.write(req.body);
