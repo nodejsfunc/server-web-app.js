@@ -1,0 +1,9 @@
+/var/log/server-web-app/*log {
+    missingok
+    notifempty
+    compress
+    rotate 30
+    daily
+    copytruncate
+    dateext
+}
