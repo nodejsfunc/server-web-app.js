@@ -35,12 +35,6 @@ Server Web App based on express and NodeJS
 %{__mkdir} -p %{buildroot}%{_sysconfdir}/logrotate.d
 %{__install} -p %{SOURCE2} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 
-
-#%{__cp} -r app/ %{buildroot}%{_localstatedir}/www/server
-#%{__install} app.js %{buildroot}%{_localstatedir}/www/server
-#%{__cp} -r node_modules/ %{buildroot}%{_localstatedir}/www/server
-#%{__install} package.json %{buildroot}%{_localstatedir}/www/server
-
 %clean
 rm -rf %{buildroot}
 
