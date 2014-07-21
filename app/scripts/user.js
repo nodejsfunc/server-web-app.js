@@ -15,15 +15,20 @@ module.exports = function(req, res, next){
 				try{
 					var user_data = JSON.parse(value);
 					var user_id = user_data.user_id;
+					var expires = user_data.expires;
 
 					if (req.query['no-cache']) {
 						// make request with user id
 						req.options.path = '/users/' + user_id;
 					} else {
-						req.body = querystring.stringify({
+						var post_data = {
 							refresh_token: user_data.refresh_token,
 							grant_type: constants.AUTH_REFRESH_TOKEN_NAME
-						});
+						};
+						if (expires) {
+							post_data[constants.AUTH_PARAM_REMEMBER_ME] = 'true';
+						}
+						req.body = querystring.stringify(post_data);
 						// Return user data from /oauth/token endpoint (workaround for /users/{id} requiring critical elevation):
 						req.options = extend(true, {}, config.api_domains.auth.options);
 						req.options.path = constants.REFRESH_TOKEN_PATH;
