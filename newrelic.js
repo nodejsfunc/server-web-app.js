@@ -44,8 +44,8 @@ exports.config = {
       { pattern: "/api/secure-service/my/library", name: "/my/library" },
       { pattern: "/api/local/signout", name: "/local/signout" },
       { pattern: "/api/local/config", name: "/local/config" },
-      { pattern: "/api/secure-service/admin/users/*/credit", name: "/admin/users/*/credit" },
-      { pattern: "/api/secure-service/admin/users/*/purchases", name: "/admin/users/*/purchases" }
+      { pattern: "/api/secure-service/admin/users/.*/credit", name: "/admin/users/:user/credit" },
+      { pattern: "/api/secure-service/admin/users/.*/purchases", name: "/admin/users/:user/purchases" }
     ]
   }
 };
