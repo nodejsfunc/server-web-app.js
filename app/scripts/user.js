@@ -44,17 +44,20 @@ module.exports = function(req, res, next){
 				} catch(e) {
 					// error retrieving valid data from redis database
 					res.clearCookie(constants.AUTH_ACCESS_TOKEN_NAME, { path: '/api' });
+					res.set('www-authenticate', constants.INVALID_TOKEN);
 					res.send(401);
 					res.end();
 				}
 			}, function(){ // on error
 				// error connecting to redis
 				res.clearCookie(constants.AUTH_ACCESS_TOKEN_NAME, { path: '/api' });
+				res.set('www-authenticate', constants.INVALID_TOKEN);
 				res.send(401);
 				res.end();
 			});
 		} else {
 			// missing authentication token
+			res.set('www-authenticate', constants.INVALID_TOKEN);
 			res.send(401);
 			res.end();
 		}
