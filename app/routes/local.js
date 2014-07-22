@@ -14,7 +14,9 @@ router
 		var access_token = req.cookies[constants.AUTH_ACCESS_TOKEN_NAME];
 
     if (access_token === undefined) {
-      res.send(400, {error: 'We need the access token cookie to be set.'});
+	    res.set('www-authenticate', constants.INVALID_TOKEN);
+	    res.send(401);
+	    return;
     }
 
     repository.get(access_token).then(function(data){
