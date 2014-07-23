@@ -217,7 +217,6 @@ router
 			res.set('Content-Type', 'application/json');
 			res.set('Content-length', Buffer.byteLength(response));
 			res.send(500, response);
-			res.end();
 		};
 
 		// make request on behalf of the website

@@ -54,7 +54,6 @@ router
 	})
 	.get(constants.CLIENT_CONFIG_PATH, function(req, res){
 		res.send(200, config.clientConfig);
-		res.end();
 	});
 
 module.exports = router;
