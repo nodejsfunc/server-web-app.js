@@ -9,6 +9,7 @@ var config = require('./../config/config'),
 module.exports = function(req, res, next){
 	if(req.options.host === config.api_domains.auth.options.host && req.method === 'GET' &&
 		(req.options.path === '/users' || req.options.path.substr(0, 7) === '/users?')){
+		// accessing the users service
 		if(req.cookies.hasOwnProperty(constants.AUTH_ACCESS_TOKEN_NAME)){
 			var token = req.cookies[constants.AUTH_ACCESS_TOKEN_NAME];
 			repository.get(token).then(function(value){ // on success
@@ -41,19 +42,24 @@ module.exports = function(req, res, next){
 					}
 					next();
 				} catch(e) {
-					// error retrieving valid data from redis database, continue original request
+					// error retrieving valid data from redis database
 					res.clearCookie(constants.AUTH_ACCESS_TOKEN_NAME, { path: '/api' });
-					next();
+					res.set('www-authenticate', constants.INVALID_TOKEN);
+					res.send(401);
 				}
 			}, function(){ // on error
-				// error connecting to redis, continue request
+				// error connecting to redis
 				res.clearCookie(constants.AUTH_ACCESS_TOKEN_NAME, { path: '/api' });
-				next();
+				res.set('www-authenticate', constants.INVALID_TOKEN);
+				res.send(401);
 			});
 		} else {
-			next();
+			// missing authentication token
+			res.set('www-authenticate', constants.INVALID_TOKEN);
+			res.send(401);
 		}
 	} else {
+		// not accessing the users service, continue the request as is
 		next();
 	}
 };
