@@ -27,10 +27,10 @@ describe('Local routing', function(){
 		server.close();
 	});
 
-  it('should return a 400 when we have not set the access_token cookie', function(done){
+  it('should return a 401 when we have not set the access_token cookie', function(done){
     request
       .get(constants.LOCAL_PATH + constants.SIGN_OUT_PATH)
-      .expect(400, done);
+      .expect(401, done);
   });
 
   it('should return an appropriate HTTP status if access_token cannot be found', function(done){
