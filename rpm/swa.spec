@@ -11,7 +11,6 @@ Vendor: blinkbox books
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Requires: nodejs >= 0.10.21
-Requires: redis >= 2.8.8
 
 %description
 Server Web App based on express and NodeJS
