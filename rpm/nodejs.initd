@@ -8,8 +8,7 @@ PATH="/usr/local/bin:${PATH}"
 NODEJS_USER=bbb_nodejs
 
 function stop {
-        pkill -f /usr/bin/node
-        pkill -f app.js
+        killall node
 }
 
 function start {
