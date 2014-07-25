@@ -29,5 +29,6 @@ module.exports = {
 	ADMIN_CREDIT_PATH: 'credit',
 	EXPIRED_TOKEN: 'The access token expired',
 	INVALID_TOKEN: 'The access token is invalid',
+	NO_TOKEN: 'Bearer',
 	UNVERIFIED_IDENTITY: 'User identity must be reverified'
 };
