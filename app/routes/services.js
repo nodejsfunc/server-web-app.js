@@ -69,58 +69,90 @@ router
 			}
 			var response_body = '';
 			proxy_response.on('data', function (chunk) {
-				response_body += chunk;
+				if (!chunked) {
+					response_body += chunk;
+				} else {
+					res.write(chunk);
+				}
+			});
+
+			proxy_response.on('end', function() {
 				if (!chunked) {
 					// If appropriate, translate the authentication OAuth2 bearer token back to a cookie
 					if ((req.options.path.indexOf(constants.AUTH_PATH_COMPONENT) !== -1 || req.options.path.indexOf(constants.AUTH_USERS_PATH) !== -1) &&
 						proxy_response.headers.hasOwnProperty('content-type') &&
 						proxy_response.headers['content-type'].indexOf('application/json') === 0) {
 						try {
-							var json_response = JSON.parse(response_body);
-							var access_token;
+							var json_response = JSON.parse(response_body),
+									old_access_token,
+									access_token,
+									refresh_token,
+									user_id_parts,
+									user_id,
+									body,
+									remember_me,
+									expires,
+									expiresDate,
+									writeResponse;
 							if (json_response.hasOwnProperty(constants.AUTH_ACCESS_TOKEN_NAME)) {
+								writeResponse = function () {
+									// save new access token
+									_updateAccessToken(old_access_token, access_token, {
+										refresh_token: refresh_token,
+										user_id: user_id,
+										expires: expires
+									});
+
+									res.cookie(constants.AUTH_ACCESS_TOKEN_NAME, access_token, { path: '/api', expires: expiresDate, httpOnly: true, secure: true });
+
+									// Strip the access and refresh tokens from the response body:
+									delete json_response[constants.AUTH_REFRESH_TOKEN_NAME];
+									delete json_response[constants.AUTH_ACCESS_TOKEN_NAME];
+									response_body = JSON.stringify(json_response);
+
+									res.setHeader('Content-Length', Buffer.byteLength(response_body));
+									res.write(response_body);
+									res.end();
+								};
+
 								// response is a refresh token request to the /oauth/token endpoint
+								old_access_token = req.cookies[constants.AUTH_ACCESS_TOKEN_NAME];
 								access_token = json_response[constants.AUTH_ACCESS_TOKEN_NAME];
-								var refresh_token = json_response[constants.AUTH_REFRESH_TOKEN_NAME];
+								refresh_token = json_response[constants.AUTH_REFRESH_TOKEN_NAME];
 
 								// get the user id from the response
-								var user_id = json_response.user_id.split(':');
-								user_id = user_id[user_id.length - 1];
+								user_id_parts = json_response.user_id.split(':');
+								user_id = user_id_parts[user_id_parts.length - 1];
 
-                var body = querystring.parse(req.body) || {};
+								body = querystring.parse(req.body) || {};
 
-                // handle persistent and non-persistent authentication
-								var expires = body[constants.AUTH_PARAM_REMEMBER_ME] === 'true' ? Date.now() + constants.AUTH_MAX_AGE : undefined;
-								var expiresDate = expires ? new Date(expires) : null;
+								remember_me = body[constants.AUTH_PARAM_REMEMBER_ME] === 'true';
 
-								res.cookie(constants.AUTH_ACCESS_TOKEN_NAME, access_token, { path: '/api', expires: expiresDate, httpOnly: true, secure: true });
-
-								// save new access token
-								_updateAccessToken(req.cookies[constants.AUTH_ACCESS_TOKEN_NAME], access_token, {
-									refresh_token: refresh_token,
-									user_id: user_id,
-									expires: expires
-								});
-
-								// Strip the access and refresh tokens from the response body:
-								delete json_response[constants.AUTH_REFRESH_TOKEN_NAME];
-								delete json_response[constants.AUTH_ACCESS_TOKEN_NAME];
-								chunk = JSON.stringify(json_response);
-
-								res.setHeader('Content-Length', Buffer.byteLength(chunk));
+								if (!remember_me && !!old_access_token) {
+									// Retrieve the expires value stored for the old access token:
+									repository.get(old_access_token).then(function (value) {
+										try {
+											expires = JSON.parse(value).expires;
+											expiresDate = expires ? new Date(expires) : null;
+										} catch (ignore) {}
+										writeResponse();
+									}, writeResponse); // continue on redis errors
+								} else {
+									// handle persistent and non-persistent authentication
+									expires = remember_me ? Date.now() + constants.AUTH_MAX_AGE : undefined;
+									expiresDate = expires ? new Date(expires) : null;
+									writeResponse();
+								}
+								return;
 							}
-						}
-						catch (e) {
+						} catch (e) {
 							console.log('Invalid JSON when attempting to parse response body for auth token');
 							e.message += ' - Invalid JSON when attempting to parse response body for auth token';
 							bugsense.logError(e);
 						}
 					}
+					res.write(response_body);
 				}
-				res.write(chunk);
-			});
-
-			proxy_response.on('end', function() {
 				res.end();
 			});
 		};
