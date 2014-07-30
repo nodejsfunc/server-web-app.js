@@ -151,7 +151,7 @@ router
 							bugsense.logError(e);
 						}
 					}
-					res.write(response_body);
+					res.write(response_body || '');
 				}
 				res.end();
 			});
