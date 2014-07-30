@@ -40,6 +40,7 @@ rm -rf %{buildroot}
 %files
 %defattr( 0644, bbb_nodejs, bbb_nodejs, 0755 )
 %attr(0755,root,root) %{_sysconfdir}/init.d/%{name}
+%config(noreplace) %{_localstatedir}/www/server/app/config/config.json
 %{_localstatedir}/www/server/*
 %{_localstatedir}/log/%{name}
 %attr(0644,root,root) %{_sysconfdir}/logrotate.d/%{name}
@@ -52,3 +53,6 @@ exit 0
 
 %post
 
+%changelog
+* Wed Jul 30 2014 Timothy Clarke <timothyc@blinkbox.com>
+- Tweaked spec so server/app/config/config.json is a config/noreplace file
