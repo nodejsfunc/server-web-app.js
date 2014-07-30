@@ -67,10 +67,10 @@ router
 				}
 				res.status(proxy_response.statusCode);
 			}
-			var response_body = '';
+			var response_body;
 			proxy_response.on('data', function (chunk) {
 				if (!chunked) {
-					response_body += chunk;
+					response_body = chunk;
 				} else {
 					res.write(chunk);
 				}
@@ -83,7 +83,7 @@ router
 						proxy_response.headers.hasOwnProperty('content-type') &&
 						proxy_response.headers['content-type'].indexOf('application/json') === 0) {
 						try {
-							var json_response = JSON.parse(response_body),
+							var json_response = JSON.parse(String(response_body)),
 									old_access_token,
 									access_token,
 									refresh_token,
@@ -108,8 +108,8 @@ router
 									// Strip the access and refresh tokens from the response body:
 									delete json_response[constants.AUTH_REFRESH_TOKEN_NAME];
 									delete json_response[constants.AUTH_ACCESS_TOKEN_NAME];
-									response_body = JSON.stringify(json_response);
 
+									response_body = JSON.stringify(json_response);
 									res.setHeader('Content-Length', Buffer.byteLength(response_body));
 									res.write(response_body);
 									res.end();
