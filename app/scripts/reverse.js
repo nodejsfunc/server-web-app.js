@@ -57,7 +57,5 @@ module.exports = function(req, res, next){
 		req.options.headers['content-length'] = Buffer.byteLength(req.body || '');
 	}
 
-	console.log(req.headers);
-
 	next();
 };

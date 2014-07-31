@@ -166,7 +166,6 @@ router
 		 * @private
 		 */
 		var _request = function(options, onSuccess, onError, cookie){
-			console.log(options);
 			var request = proxy_scheme.request(extend({}, options), function(proxy_response){
 				if(res.headersSent){
 					return;
