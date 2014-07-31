@@ -67,10 +67,10 @@ router
 				}
 				res.status(proxy_response.statusCode);
 			}
-			var response_body;
+			var buffers = [];
 			proxy_response.on('data', function (chunk) {
 				if (!chunked) {
-					response_body = chunk;
+					buffers.push(chunk);
 				} else {
 					res.write(chunk);
 				}
@@ -78,6 +78,7 @@ router
 
 			proxy_response.on('end', function() {
 				if (!chunked) {
+					var response_body = Buffer.concat(buffers);
 					// If appropriate, translate the authentication OAuth2 bearer token back to a cookie
 					if ((req.options.path.indexOf(constants.AUTH_PATH_COMPONENT) !== -1 || req.options.path.indexOf(constants.AUTH_USERS_PATH) !== -1) &&
 						proxy_response.headers.hasOwnProperty('content-type') &&
@@ -151,7 +152,7 @@ router
 							bugsense.logError(e);
 						}
 					}
-					res.write(response_body || '');
+					res.write(response_body);
 				}
 				res.end();
 			});
