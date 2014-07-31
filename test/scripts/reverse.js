@@ -18,8 +18,8 @@ describe('Reverse', function(){
 		constants.LIBRARY_PATH,
 		constants.ADMIN_PATH + '/1/' + constants.ADMIN_CREDIT_PATH
 	], headers = {
-		accept: 'accept',
-		type: 'type'
+		'x-content-type': 'bbb',
+		'type': 'type'
 	};
 
 	beforeEach(function(){
@@ -46,24 +46,24 @@ describe('Reverse', function(){
 	it('should not reverse headers for all paths', function(done){
 		request
 			.post('/domain/random_path')
-			.set('accept', headers.accept)
+			.set('x-content-type', headers['x-content-type'])
 			.set('content-type', headers.type)
 			.expect(201, function(err, res){
 				should.not.exist(err);
-				should(res.body.headers['content-type']).not.be.exactly(headers.accept);
+				should(res.body.headers['content-type']).not.be.exactly(headers['x-content-type']);
 				done();
 			});
 	});
 
 	var _test = function (path) {
-		it('should reverse accept and content type header for ' + path, function (done) {
+		it('should reverse x-content-type and content type header for ' + path, function (done) {
 			request
 				.post('/domain/' + path)
-				.set('accept', headers.accept)
+				.set('x-content-type', headers['x-content-type'])
 				.set('content-type', headers.type)
 				.expect(201, function (err, res) {
 					should.not.exist(err);
-					should(res.body.headers['content-type']).be.exactly(headers.accept);
+					should(res.body.headers['content-type']).be.exactly(headers['x-content-type']);
 					done();
 				});
 		});
