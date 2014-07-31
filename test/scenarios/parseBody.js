@@ -59,7 +59,7 @@ describe('Parse body', function(){
 		it('should JSON stringify the body for ' + path , function(done){
 			request
 				.post('/domain/' + path)
-				.set('accept', 'application/json')
+				.set('x-content-type', 'application/json')
 				.send(body)
 				.expect(201, JSON.stringify(body), done);
 		});
