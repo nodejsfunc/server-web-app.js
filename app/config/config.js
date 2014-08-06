@@ -3,6 +3,7 @@
 var merchant_arg = process.argv.indexOf('-merchantKey'),
 	google_arg = process.argv.indexOf('-googleAnalyticsID'),
 	bugsense_arg = process.argv.indexOf('-bugsenseKey'),
+  affiliate_window_arg = process.argv.indexOf('-affiliateWindowID'),
 	config = require('./config.json'),
 	result = {
 		api_domains: config.domains,
@@ -16,7 +17,8 @@ var merchant_arg = process.argv.indexOf('-merchantKey'),
 			'merchantKey': merchant_arg !== -1 ? process.argv[merchant_arg + 1] : config.clientConfig.merchantKey,
 			'googleAnalyticsID': google_arg !== -1 ? process.argv[google_arg + 1] : config.clientConfig.googleAnalyticsID,
 			'nonSecureServicesDomain': config.clientConfig.nonSecureServicesDomain,
-			'bugsenseKey': bugsense_arg !== -1 ? process.argv[bugsense_arg + 1] : config.clientConfig.bugsenseKey
+			'bugsenseKey': bugsense_arg !== -1 ? process.argv[bugsense_arg + 1] : config.clientConfig.bugsenseKey,
+      'affiliateWindow': affiliate_window_arg !== -1 ? process.argv[affiliate_window_arg + 1] : config.clientConfig.affiliateWindow
 		}
 	};
 
