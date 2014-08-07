@@ -14,8 +14,14 @@ if (config.graylog) {
 	logger = {
 		error: function () {
 			console.error.apply(console, arguments);
+		},
+		warn: function () {
+			console.warn.apply(console, arguments);
+		},
+		info: function () {
+			console.info.apply(console, arguments);
 		}
-	}
+	};
 }
 
 module.exports = logger;

@@ -4,7 +4,6 @@ var express = require('express'),
 	bodyParser = require('body-parser'),
 	cookieParser = require('cookie-parser'),
 	timeout = require('connect-timeout'),
-	logger = require('morgan'),
 	port = process.env.PORT || 3000,
 	constants = require('./app/config/constants'),
 	config = require('./app/config/config'),
@@ -15,7 +14,7 @@ var express = require('express'),
 var app = express();
 
 app.enable('trust proxy'); // required for nginx
-app.use(logger('dev'));
+app.use(middleware.requestLogger);
 app.use(middleware.csrfHeader);
 app.use(middleware.poweredByHeader);
 app.use(bodyParser());

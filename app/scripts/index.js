@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = {
+	requestLogger: require('./requestLogger'),
 	domain: require('./domain'),
 	poweredByHeader: require('./poweredByHeader'),
 	csrfHeader: require('./csrfHeader'),
