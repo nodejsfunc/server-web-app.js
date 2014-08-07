@@ -3,12 +3,11 @@
 var constants = require('./../config/constants'),
 	config = require('./../config/config'),
 	redis = require('redis').createClient(config.databasePort, config.databaseDomain),
-	bugsense = require('./../util/bugsense'),
+	logger = require('./../util/logger'),
 	Q = require('q');
 
 redis.on('error', function redisError(error){
-	console.log('\u001b[31m', 'Redis error --> ', error, '\u001b[0m');
-	bugsense.logError(error);
+	logger.error('Redis error:', error);
 });
 
 module.exports = {
@@ -17,7 +16,7 @@ module.exports = {
 			// all redis entries are deleted after a certain time
 			redis.set(key, value, 'PX', constants.AUTH_MAX_AGE);
 		} else {
-			console.log('Error options for redis SET', key, '-', value);
+			logger.error('Error options for redis SET', key, value);
 		}
 	},
 	get: function(key){

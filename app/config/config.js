@@ -2,7 +2,10 @@
 
 var merchant_arg = process.argv.indexOf('-merchantKey'),
 	google_arg = process.argv.indexOf('-googleAnalyticsID'),
-	bugsense_arg = process.argv.indexOf('-bugsenseKey'),
+	graylog_host_arg = process.argv.indexOf('-graylogHost'),
+	graylog_host = graylog_host_arg !== -1 && process.argv[graylog_host_arg + 1],
+	graylog_port_arg = process.argv.indexOf('-graylogPort'),
+	graylog_port = graylog_host_arg !== -1 && Number(process.argv[graylog_port_arg + 1]),
 	config = require('./config.json'),
 	result = {
 		api_domains: config.domains,
@@ -10,19 +13,18 @@ var merchant_arg = process.argv.indexOf('-merchantKey'),
 		databaseDomain: config.databaseDomain,
 		databasePort: config.databasePort,
 		newRelicKey: config.newRelicKey || '',
-		bugsenseKey: config.bugsenseKey || '',
+		// Only add the graylog config if we have valid server environment arguments:
+		graylog: graylog_host && graylog_port && {
+			servers:[
+				{host: graylog_host, port: graylog_port}
+			]
+		},
 		// Override the client config if defined in the command line parameters
 		clientConfig: {
 			'merchantKey': merchant_arg !== -1 ? process.argv[merchant_arg + 1] : config.clientConfig.merchantKey,
 			'googleAnalyticsID': google_arg !== -1 ? process.argv[google_arg + 1] : config.clientConfig.googleAnalyticsID,
-			'nonSecureServicesDomain': config.clientConfig.nonSecureServicesDomain,
-			'bugsenseKey': bugsense_arg !== -1 ? process.argv[bugsense_arg + 1] : config.clientConfig.bugsenseKey
+			'nonSecureServicesDomain': config.clientConfig.nonSecureServicesDomain
 		}
 	};
 
-// bugsense api key is hard-coded for live, until ops adds the command line param
-// disabled, see CWA-1659 result.clientConfig.bugsenseKey = !result.clientConfig.bugsenseKey && result.clientConfig.nonSecureServicesDomain === 'api.blinkboxbooks.com' ? '9fa7c727' : result.clientConfig.bugsenseKey;
-result.bugsenseKey = !result.bugsenseKey && result.clientConfig.nonSecureServicesDomain === 'api.blinkboxbooks.com'? '649f61e5': '';
-
 module.exports = result;
-

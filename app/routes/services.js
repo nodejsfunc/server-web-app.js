@@ -4,7 +4,7 @@ var express = require('express'),
 	constants = require('./../config/constants'),
 	config = require('./../config/config'),
 	repository = require('./../util/repository'),
-	bugsense = require('./../util/bugsense'),
+	logger = require('./../util/logger'),
 	middleware = require('./../scripts'),
 	router = express.Router(),
 	http = require('http'),
@@ -147,9 +147,7 @@ router
 								return;
 							}
 						} catch (e) {
-							console.log('Invalid JSON when attempting to parse response body for auth token');
-							e.message += ' - Invalid JSON when attempting to parse response body for auth token';
-							bugsense.logError(e);
+							logger.error('Invalid JSON when attempting to parse response body for auth token:', e);
 						}
 					}
 					res.write(response_body);

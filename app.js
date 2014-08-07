@@ -9,8 +9,7 @@ var express = require('express'),
 	constants = require('./app/config/constants'),
 	config = require('./app/config/config'),
 	middleware = require('./app/scripts'),
-	routes = require('./app/routes'),
-	bugsense = require('./app/util/bugsense');
+	routes = require('./app/routes');
 
 // Configure application
 var app = express();
@@ -30,7 +29,6 @@ app.use(middleware.notFound);
 app.use(middleware.error);
 
 // Third party integrations
-bugsense.register(config.bugsenseKey);
 if (config.newRelicKey) {
 	require('newrelic');
 }
