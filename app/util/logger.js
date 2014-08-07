@@ -12,6 +12,9 @@ if (config.graylog) {
 } else {
 	// Log to console if not logging to Graylog2:
 	logger = {
+		emergency: function () {
+			console.error.apply(console, arguments);
+		},
 		critical: function () {
 			console.error.apply(console, arguments);
 		},

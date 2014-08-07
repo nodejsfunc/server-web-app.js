@@ -14,7 +14,7 @@ redis.on('reconnecting', function redisError () {
 });
 redis.on('error', function redisError (error) {
 	var message = String(error),
-			logType = /connection/.test(message) ? 'critical' : 'error';
+			logType = /connection/.test(message) ? 'emergency' : 'critical';
 	logger[logType](message);
 });
 redis.on('end', function redisError () {
