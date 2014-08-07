@@ -8,7 +8,8 @@ var express = require('express'),
 	constants = require('./app/config/constants'),
 	config = require('./app/config/config'),
 	middleware = require('./app/scripts'),
-	routes = require('./app/routes');
+	routes = require('./app/routes'),
+	logger = require('./app/util/logger');
 
 // Configure application
 var app = express();
@@ -32,6 +33,11 @@ if (config.newRelicKey) {
 	require('newrelic');
 }
 
+process.on('SIGINT', function() {
+	logger.notice('Express server shutting down');
+	process.exit();
+});
+
 // Start server
 app.listen(port);
-console.log('Express server listening on port ' + port);
+logger.notice('Express server listening on port ' + port);

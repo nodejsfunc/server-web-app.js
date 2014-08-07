@@ -16,5 +16,5 @@ module.exports = function(err, req, res, next){
 		res.setHeader('Content-Length', Buffer.byteLength(response));
 		res.send(500, response);
 	}
-	logger.error(err);
+	logger.critical(err);
 };
