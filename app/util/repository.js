@@ -6,8 +6,19 @@ var constants = require('./../config/constants'),
 	logger = require('./../util/logger'),
 	Q = require('q');
 
-redis.on('error', function redisError(error){
-	logger.error('Redis error:', error);
+redis.on('connect', function redisError () {
+	logger.notice('Redis connection established');
+});
+redis.on('reconnecting', function redisError () {
+	logger.notice('Reconnecting to Redis...');
+});
+redis.on('error', function redisError (error) {
+	var message = String(error),
+			logType = /connection/.test(message) ? 'critical' : 'error';
+	logger[logType](message);
+});
+redis.on('end', function redisError () {
+	logger.notice('Redis connection closed');
 });
 
 module.exports = {
