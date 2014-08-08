@@ -10,7 +10,7 @@ var express = require('express'),
 var auth = require('./../services/auth');
 
 router
-	.get(constants.SIGN_OUT_PATH, function(req, res){
+	.get(constants.SIGN_OUT_PATH, function (req, res) {
 		var access_token = req.cookies[constants.AUTH_ACCESS_TOKEN_NAME];
     if (!access_token) {
 	    res.set('www-authenticate', constants.NO_TOKEN);
@@ -35,8 +35,35 @@ router
       }
     }, errorHandler);
 	})
-	.get(constants.CLIENT_CONFIG_PATH, function(req, res){
+	.get(constants.CLIENT_CONFIG_PATH, function (req, res) {
 		res.send(200, config.clientConfig);
+	})
+	.post(constants.LOG_PATH, function (req, res) {
+		var timestamp = Date.now(),
+				startDate = new Date(timestamp),
+				data = req.body;
+		if (!data) {
+			throw(new Error('No log data sent.'));
+		}
+		if (!data.message) {
+			throw(new Error('Missing log message.'));
+		}
+		if (data.level && typeof logger[data.level] !== 'function') {
+			throw(new Error('Invalid log level: ' + data.level));
+		}
+		if (!data.level) {
+			data.level = 'error'; // Default logging level for CWA logs
+		}
+		res.send(200);
+		logger[data.level](String(data.message), {
+			appName: 'CWA',
+			timestamp: timestamp,
+			datetime: startDate,
+			httpUserAgent: req.headers['user-agent'],
+			httpClientIP: req.ip || req._remoteAddress || (req.connection && req.connection.remoteAddress),
+			httpVia: req.headers.via,
+			httpXForwardedFor: req.headers['x-forwarded-for']
+		});
 	});
 
 module.exports = router;

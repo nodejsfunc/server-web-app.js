@@ -19,6 +19,7 @@ module.exports = {
 	SIGN_OUT_PATH : '/signout',
 	BASE_PATH: '/api',
 	CLIENT_CONFIG_PATH: '/config',
+	LOG_PATH: '/log',
 	CREDIT_CARD_PATH: '/service/my/creditcards',
 	BASKET_PATH: '/service/my/baskets',
 	PURCHASE_PATH: '/service/my/payments',
