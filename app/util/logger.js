@@ -3,6 +3,7 @@
 var graylog2 = require('graylog2'),
 		config = require('../config/config'),
 		logger,
+		loggerMap,
 		logInterface;
 
 // Only add the graylog config if we have valid server settings:
@@ -13,29 +14,17 @@ if (config.graylog.host && config.graylog.port) {
 	});
 } else {
 	// Log to console if not logging to Graylog2:
-	logger = {
-		emergency: function () {
-			console.error.apply(console, arguments);
-		},
-		critical: function () {
-			console.error.apply(console, arguments);
-		},
-		error: function () {
-			console.error.apply(console, arguments);
-		},
-		warn: function () {
-			console.warn.apply(console, arguments);
-		},
-		notice: function () {
-			console.log.apply(console, arguments);
-		},
-		info: function () {
-			console.info.apply(console, arguments);
-		}
+	logger = console;
+	// Map non-existing log level functions to alternatives:
+	loggerMap = {
+		emergency: 'error',
+		critical: 'error',
+		notice: 'log'
 	};
 }
 
 function createLogFunction (level) {
+	var func = logger[level] || logger[loggerMap[level]];
 	return function (err, fields) {
 		fields = fields || {};
 		if (typeof err !== 'string') {
@@ -47,7 +36,7 @@ function createLogFunction (level) {
 		if (!fields.appName) {
 			fields.appName = 'SWA';
 		}
-		logger[level](err, fields);
+		func.call(logger, err, fields);
 	};
 }
 
