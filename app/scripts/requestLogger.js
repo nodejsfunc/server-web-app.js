@@ -39,7 +39,7 @@ module.exports = function (req, res, next) {
 				httpXRequestedWith: req.headers['x-requested-with'],
 				httpXRequestedBy: req.headers['x-requested-by'],
 				httpCacheControl: responseHeaders['cache-control'],
-				httpContentLength: responseHeaders['content-length'],
+				httpContentLength: Number(responseHeaders['content-length']),
 				httpWWWAuthenticate: responseHeaders['www-authenticate'],
 				httpApplicationTime: appTime
 			},
