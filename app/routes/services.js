@@ -147,7 +147,7 @@ router
 								return;
 							}
 						} catch (e) {
-							logger.critical('Invalid JSON when attempting to parse response body for auth token:', e);
+							logger.critical(e);
 						}
 					}
 					res.write(response_body);
