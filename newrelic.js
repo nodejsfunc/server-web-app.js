@@ -11,6 +11,7 @@ exports.config = {
    * Array of application names.
    */
   app_name : ['server_web_app'],
+  capture_params : true,
   /**
    * Your New Relic license key.
    */
@@ -46,6 +47,7 @@ exports.config = {
       { pattern: "/api/local/config", name: "/local/config" },
       { pattern: "/api/secure-service/admin/users/.*/credit", name: "/admin/users/:user/credit" },
       { pattern: "/api/secure-service/admin/users/.*/purchases", name: "/admin/users/:user/purchases" }
-    ]
+    ],
+    enforce_backstop : false
   }
 };
