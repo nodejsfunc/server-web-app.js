@@ -33,12 +33,12 @@ describe('Error handler', function(){
 	it('should return 504 when the error contains a timeout param', function(done){
 		request
 			.get(paths.timeout)
-			.expect(504, /timeout of 5ms exceeded/, done);
+			.expect(504, done);
 	});
 
 	it('should return 500 when an unexpected error is generated', function(done){
 		request
 			.get(paths.error)
-			.expect(500, JSON.stringify({ code: 500, error: '500 Oh oh! something broke!' }), done);
+			.expect(500, done);
 	});
 });
