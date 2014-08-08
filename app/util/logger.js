@@ -2,7 +2,8 @@
 
 var graylog2 = require('graylog2'),
 		config = require('../config/config'),
-		logger;
+		logger,
+		logInterface;
 
 // Only add the graylog config if we have valid server settings:
 if (config.graylog.host && config.graylog.port) {
@@ -34,4 +35,32 @@ if (config.graylog.host && config.graylog.port) {
 	};
 }
 
-module.exports = logger;
+function createLogFunction (level) {
+	return function (err, fields) {
+		fields = fields || {};
+		if (typeof err !== 'string') {
+			if (err) {
+				fields.stack = err.stack;
+			}
+			err = String(err);
+		}
+		if (!fields.appName) {
+			fields.appName = 'SWA';
+		}
+		logger[level](err, fields);
+	};
+}
+
+logInterface = {};
+[
+	'emergency',
+	'critical',
+	'error',
+	'warn',
+	'notice',
+	'info'
+].forEach(function (level) {
+	logInterface[level] = createLogFunction(level);
+});
+
+module.exports = logInterface;
