@@ -1,6 +1,7 @@
 'use strict';
 
-var logger = require('./../util/logger');
+var logger = require('./../util/logger'),
+		config = require('./../config/config');
 
 module.exports = function (err, req, res, next) {
 	if (!err) {
@@ -11,4 +12,7 @@ module.exports = function (err, req, res, next) {
 		res.send(500);
 	}
 	logger.critical(err);
+	if (config.newRelicKey) {
+		require('newrelic').noticeError(err);
+	}
 };
