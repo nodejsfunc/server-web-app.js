@@ -4,8 +4,9 @@ var graylog2 = require('graylog2'),
 		config = require('../config/config'),
 		logger;
 
-if (config.graylog) {
-	logger = new graylog2.graylog(config.graylog);
+// Only add the graylog config if we have valid server settings:
+if (config.graylog.host && config.graylog.port) {
+	logger = new graylog2.graylog({servers: [config.graylog]});
 	logger.on('error', function (err) {
 		console.error('Error while trying to write to graylog2:', err);
 	});

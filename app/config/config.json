@@ -2,6 +2,10 @@
   "timeout":  5,
   "databaseDomain": "127.0.0.1",
   "databasePort": 6379,
+  "graylog": {
+		"host": "",
+		"port": 9602
+  },
   "newRelicKey": "",
 	"clientConfig": {
 		"merchantKey": "MIIBCgKCAQEA3nQA3AwLu/EDRDWww7ocqM5PeC4tANAHzyqczWC9KTOqD1hvMjiP7T/wKZUnz81iNriYJIFMY47UKTdysvFBNHt75OJJbBRa1Hf+/b8uvUBHfkbA2n+JE5GQhRU+oM+TMJSJ86Q5phVda0ddTwS8lH8D+18nXQZspbyxpfwzDiyzG9n5lX8/27byrSDixguDNfbSoTwgvmo81Obhz/ZuXjWW9U22Ss9xSznlCcnIpGN/u0BwMaiTcGUFPFhThr0R9Ia0h1fRRobt+Uh9BvkE3D1GBRtkP7dPFs7nJJQdt6pSW7zEVNjLuctX3y/C3dNvb9DeyoGT0kRSyAB3+65gNQIDAQAB",
