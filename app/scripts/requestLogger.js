@@ -23,6 +23,7 @@ module.exports = function (req, res, next) {
 			statusCode = res.statusCode,
 			responseHeaders = res._headers || {},
 			log = {
+				userId: req._userId,
 				timestamp: timestamp,
 				datetime: startDate,
 				httpClientIP: req.ip || req._remoteAddress || (req.connection && req.connection.remoteAddress),

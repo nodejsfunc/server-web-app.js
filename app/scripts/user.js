@@ -16,6 +16,7 @@ module.exports = function(req, res, next){
 				try{
 					var user_data = JSON.parse(value);
 					var user_id = user_data.user_id;
+					req._userId = user_id;
 
 					if (req.query['no-cache']) {
 						// make request with user id

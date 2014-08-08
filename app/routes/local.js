@@ -25,6 +25,7 @@ router
     repository.get(access_token).then(function (data) {
       try {
         data = JSON.parse(data);
+        req._userId = data.user_id;
         auth.revokeRefreshToken(data.refresh_token).then(function () {
           repository.del(access_token);
           res.clearCookie(constants.AUTH_ACCESS_TOKEN_NAME, { path: '/api' });
