@@ -23,11 +23,11 @@ redis.on('end', function () {
 
 module.exports = {
 	set: function(key, value){
-		if(key && value){
+		if (key && value) {
 			// all redis entries are deleted after a certain time
 			redis.set(key, value, 'PX', constants.AUTH_MAX_AGE);
 		} else {
-			logger.error('Error options for redis SET', key, value);
+			logger.error('Invalid arguments for redis SET command. (key: "' + key + '", value: "' + value + '")');
 		}
 	},
 	get: function(key){
