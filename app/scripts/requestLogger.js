@@ -5,9 +5,6 @@ var finished = require('finished'),
 		logger = require('./../util/logger');
 
 function responseTime(start) {
-	if (!start) {
-		return;
-	}
 	var diff = process.hrtime(start),
 			ms = diff[0] * 1e3 + diff[1] * 1e-6;
 	return Math.round(ms);
