@@ -43,10 +43,7 @@ router
 		var timestamp = Date.now(),
 				startDate = new Date(timestamp),
 				data = req.body;
-		if (!data) {
-			throw(new Error('No log data sent.'));
-		}
-		if (!data.message) {
+		if (!data || !data.message) {
 			throw(new Error('Missing log message.'));
 		}
 		if (data.level && typeof logger[data.level] !== 'function') {
