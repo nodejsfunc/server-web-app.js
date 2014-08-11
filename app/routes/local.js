@@ -63,7 +63,8 @@ router
 			httpUserAgent: req.headers['user-agent'],
 			httpClientIP: req.ip || req._remoteAddress || (req.connection && req.connection.remoteAddress),
 			httpVia: req.headers.via,
-			httpXForwardedFor: req.headers['x-forwarded-for']
+			httpXForwardedFor: req.headers['x-forwarded-for'],
+			stack: data.stack
 		});
 	});
 
