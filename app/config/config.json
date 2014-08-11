@@ -14,6 +14,9 @@
 			"universal": "UA-44875536-3",
 			"domain": "nodejs-internal.mobcastdev.com"
 		},
+		"affiliateWindow": {
+			"merchantID": "5997"
+		},
 		"nonSecureServicesDomain": "api.blinkboxbooks.com"
 	},
 	"domains": {
@@ -55,5 +58,3 @@
 		}
 	}
 }
-
-

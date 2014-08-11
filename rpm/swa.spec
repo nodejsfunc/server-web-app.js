@@ -52,7 +52,27 @@ rm -rf %{buildroot}
 exit 0
 
 %post
+if [ $1 -gt 1 ] ; then
+/etc/init.d/server-web-app stop
+/etc/init.d/server-web-app start
+fi
+if [ $1 -eq 1 ] ; then
+chkconfig --level 2345 server-web-app on
+/etc/init.d/server-web-app start
+fi
+exit 0
+
+%postun
+if [ $1 -eq 0 ] ; then
+chkconfig --del server-web-app
+fi
+exit 0
+
+
+
 
 %changelog
+* Thu Aug 07 2014 Timothy Clarke <timothyc@blinkbox.com>
+- Updated post commands to restart service on upgrade and ensure service in on boot.
 * Wed Jul 30 2014 Timothy Clarke <timothyc@blinkbox.com>
 - Tweaked spec so server/app/config/config.json is a config/noreplace file

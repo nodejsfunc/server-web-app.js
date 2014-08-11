@@ -2,6 +2,7 @@
 
 var merchant_arg = process.argv.indexOf('-merchantKey'),
 	google_arg = process.argv.indexOf('-googleAnalyticsID'),
+	affiliate_window_arg = process.argv.indexOf('-affiliateWindowID'),
 	graylog_arg = process.argv.indexOf('-graylogHost'),
 	graylog_config = graylog_arg !== -1 ? process.argv[graylog_arg + 1].split(':') : [],
 	config = require('./config.json'),
@@ -19,6 +20,7 @@ var merchant_arg = process.argv.indexOf('-merchantKey'),
 		clientConfig: {
 			'merchantKey': merchant_arg !== -1 ? process.argv[merchant_arg + 1] : config.clientConfig.merchantKey,
 			'googleAnalyticsID': google_arg !== -1 ? process.argv[google_arg + 1] : config.clientConfig.googleAnalyticsID,
+			'affiliateWindow': affiliate_window_arg !== -1 ? process.argv[affiliate_window_arg + 1] : config.clientConfig.affiliateWindow,
 			'nonSecureServicesDomain': config.clientConfig.nonSecureServicesDomain
 		}
 	};
