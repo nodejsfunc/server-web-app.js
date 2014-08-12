@@ -4,7 +4,7 @@ var express = require('express'),
 	constants = require('./../config/constants'),
 	config = require('./../config/config'),
 	repository = require('./../util/repository'),
-	bugsense = require('./../util/bugsense'),
+	logger = require('./../util/logger'),
 	middleware = require('./../scripts'),
 	router = express.Router(),
 	http = require('http'),
@@ -133,8 +133,10 @@ router
 									// Retrieve the expires value stored for the old access token:
 									repository.get(old_access_token).then(function (value) {
 										try {
-											expires = JSON.parse(value).expires;
+											var data = JSON.parse(value);
+											expires = data.expires;
 											expiresDate = expires ? new Date(expires) : null;
+											req._userId = data.user_id;
 										} catch (ignore) {}
 										writeResponse();
 									}, writeResponse); // continue on redis errors
@@ -147,9 +149,7 @@ router
 								return;
 							}
 						} catch (e) {
-							console.log('Invalid JSON when attempting to parse response body for auth token');
-							e.message += ' - Invalid JSON when attempting to parse response body for auth token';
-							bugsense.logError(e);
+							logger.critical(e);
 						}
 					}
 					res.write(response_body);
@@ -274,6 +274,7 @@ router
 									refresh_token = obj.refresh_token,
 									expires = obj.expires,
 									user_id = obj.user_id;
+								req._userId = user_id;
 								// get new access token
 								_refreshToken(refresh_token, function(result){
 									var new_access_token = result.access_token;

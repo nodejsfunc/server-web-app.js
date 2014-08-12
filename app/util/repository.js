@@ -3,21 +3,31 @@
 var constants = require('./../config/constants'),
 	config = require('./../config/config'),
 	redis = require('redis').createClient(config.databasePort, config.databaseDomain),
-	bugsense = require('./../util/bugsense'),
+	logger = require('./../util/logger'),
 	Q = require('q');
 
-redis.on('error', function redisError(error){
-	console.log('\u001b[31m', 'Redis error --> ', error, '\u001b[0m');
-	bugsense.logError(error);
+redis.on('connect', function () {
+	logger.notice('Redis connection established');
+});
+redis.on('reconnecting', function () {
+	logger.notice('Reconnecting to Redis...');
+});
+redis.on('error', function redisError (error) {
+	var message = String(error),
+			logType = /connection/.test(message) ? 'emergency' : 'critical';
+	logger[logType](message);
+});
+redis.on('end', function () {
+	logger.notice('Redis connection closed');
 });
 
 module.exports = {
 	set: function(key, value){
-		if(key && value){
+		if (key && value) {
 			// all redis entries are deleted after a certain time
 			redis.set(key, value, 'PX', constants.AUTH_MAX_AGE);
 		} else {
-			console.log('Error options for redis SET', key, '-', value);
+			logger.error('Invalid arguments for redis SET command. (key: "' + key + '", value: "' + value + '")');
 		}
 	},
 	get: function(key){

@@ -5,6 +5,7 @@ var express = require('express'),
 	config = require('../../app/config/config'),
 	should = require('should'),
 	cookieParser = require('cookie-parser'),
+	bodyParser = require('body-parser'),
 	routes = require('../../app/routes'),
 	request = require('supertest')('http://localhost:3000'),
   nock = require('nock'),
@@ -19,6 +20,7 @@ describe('Local routing', function(){
 	beforeEach(function(){
 		var app = express();
 		app.use(cookieParser());
+		app.use(bodyParser());
 		app.use(constants.LOCAL_PATH, routes.local);
 		server = app.listen(3000);
 	});
@@ -107,4 +109,39 @@ describe('Local routing', function(){
       .set('Cookie', 'access_token=something-that-would-cause-an-error')
       .expect(500, done);
   });
+
+	it('should provide a logging API', function (done) {
+		request
+			.post(constants.LOCAL_PATH + constants.LOG_PATH)
+			.send({message: 'Client-side error occured.'})
+			.expect(200, done);
+	});
+
+	it('Logging API should allow setting the log level', function (done) {
+		request
+			.post(constants.LOCAL_PATH + constants.LOG_PATH)
+			.send({message: 'Client-side error occured.', level: 'critical'})
+			.expect(200, done);
+	});
+
+	it('Logging API should return 500 if no request body is sent', function (done) {
+		request
+			.post(constants.LOCAL_PATH + constants.LOG_PATH)
+			.expect(500, done);
+	});
+
+	it('Logging API should return 500 if no message is sent', function (done) {
+		request
+			.post(constants.LOCAL_PATH + constants.LOG_PATH)
+			.send({})
+			.expect(500, done);
+	});
+
+	it('Logging API should return 500 if an invalid log level is sent', function (done) {
+		request
+			.post(constants.LOCAL_PATH + constants.LOG_PATH)
+			.send({message: 'Client-side error occured.', level: 'banana'})
+			.expect(500, done);
+	});
+
 });

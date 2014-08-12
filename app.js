@@ -4,19 +4,18 @@ var express = require('express'),
 	bodyParser = require('body-parser'),
 	cookieParser = require('cookie-parser'),
 	timeout = require('connect-timeout'),
-	logger = require('morgan'),
 	port = process.env.PORT || 3000,
 	constants = require('./app/config/constants'),
 	config = require('./app/config/config'),
 	middleware = require('./app/scripts'),
 	routes = require('./app/routes'),
-	bugsense = require('./app/util/bugsense');
+	logger = require('./app/util/logger');
 
 // Configure application
 var app = express();
 
 app.enable('trust proxy'); // required for nginx
-app.use(logger('dev'));
+app.use(middleware.requestLogger);
 app.use(middleware.csrfHeader);
 app.use(middleware.poweredByHeader);
 app.use(bodyParser());
@@ -30,11 +29,15 @@ app.use(middleware.notFound);
 app.use(middleware.error);
 
 // Third party integrations
-bugsense.register(config.bugsenseKey);
 if (config.newRelicKey) {
 	require('newrelic');
 }
 
+process.on('SIGINT', function() {
+	logger.notice('Express server shutting down');
+	process.exit();
+});
+
 // Start server
 app.listen(port);
-console.log('Express server listening on port ' + port);
+logger.notice('Express server listening on port ' + port);
