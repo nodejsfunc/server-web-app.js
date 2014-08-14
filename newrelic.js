@@ -10,7 +10,7 @@ exports.config = {
   /**
    * Array of application names.
    */
-  app_name : ['server_web_app'],
+  app_name : ["Server Web App"],
   capture_params : true,
   /**
    * Your New Relic license key.
@@ -23,6 +23,7 @@ exports.config = {
      * production applications.
      */
     level : 'trace'
+    filepath : '/var/log/server-web-app/newrelic.log'
   },
   rules: {
     name: [
