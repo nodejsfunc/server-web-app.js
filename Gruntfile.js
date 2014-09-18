@@ -52,6 +52,7 @@ module.exports = function (grunt) {
           src: [
             'package.json',
             'app.js',
+            'newrelic.js',
             'app/**/*',
             'node_modules/**/*',
             '!node_modules/grunt*/**',
