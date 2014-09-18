@@ -27,7 +27,7 @@ Server Web App based on express and NodeJS
 %{__install} -p %{SOURCE1} %{buildroot}%{_sysconfdir}/init.d/%{name}
 
 %{__install} -d %{buildroot}%{_localstatedir}/www/server
-%{__install} {app.js,package.json} %{buildroot}%{_localstatedir}/www/server
+%{__install} {app.js,package.json,newrelic.js} %{buildroot}%{_localstatedir}/www/server
 %{__cp} -r {app,node_modules} %{buildroot}%{_localstatedir}/www/server
 
 %{__mkdir} -p %{buildroot}%{_localstatedir}/log/%{name}
