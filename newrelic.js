@@ -22,7 +22,7 @@ exports.config = {
      * issues with the agent, 'info' and higher will impose the least overhead on
      * production applications.
      */
-    level : 'trace'
+    level : 'trace',
     filepath : '/var/log/server-web-app/newrelic.log'
   },
   rules: {
