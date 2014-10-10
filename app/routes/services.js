@@ -15,12 +15,23 @@ var express = require('express'),
 
 router
 	.use(path, middleware.domain) // verifies that domain is valid
-	.use(path, middleware.options) // creates options options to be used for proxy request
+	.use(path, middleware.options) // creates options to be used for proxy request
 	.use(path, middleware.reverse) // reverses accept and content-type headers
 	.use(path, middleware.user) // handle special case of /users/ requests
 	.use(path, function(req, res){
 		// Make the proxy HTTP request
-		var proxy_scheme = req.options.port === 443 ? https : http;
+    var proxy_scheme;
+
+    req.options.port = 443;
+
+    if (req.options.port === 443) {
+      proxy_scheme = https;
+      logger.info('Using HTTPS proxy scheme.');
+    }
+    else {
+      proxy_scheme = http;
+      logger.info('Using HTTP proxy scheme.');
+    }
 
 		// make proxy request
 		var _updateAccessToken = function(oldAT, newAT, obj){
@@ -77,6 +88,7 @@ router
 			});
 
 			proxy_response.on('end', function() {
+        logger.info('Request done');
 				if (!chunked) {
 					var response_body = Buffer.concat(buffers);
 					// If appropriate, translate the authentication OAuth2 bearer token back to a cookie
@@ -256,6 +268,8 @@ router
 		var proxy_request = _request(req.options,
 			// on success
 			function(proxy_response){
+        logger.info('Proxy response successful.');
+
 				// do not continue if the response has already been sent (example timeout)
 				if(res.headersSent){
 					return;
@@ -264,10 +278,13 @@ router
 				// if token invalid/expired
 				var error_message = proxy_response.headers['www-authenticate'] || '';
 				if(proxy_response.statusCode === 401 && (error_message.indexOf(constants.INVALID_TOKEN) !== -1 || error_message.indexOf(constants.EXPIRED_TOKEN) !== -1)){
+          logger.info('Access token is invalid, refreshing.');
+
 					// get refresh token for the invalid token
 					if(req.options.headers.Authorization){
 						var access_token = req.options.headers.Authorization.substr('Bearer '.length);
 
+            logger.info('Attempting to get access token from repository.');
 						repository.get(access_token).then(function(value){
 							try{
 								var obj = JSON.parse(value),
@@ -287,6 +304,7 @@ router
 									});
 
 									// update authorization
+                  logger.info('Translating access_token to header and making new request.');
 									req.options.headers.Authorization = 'Bearer '+ new_access_token;
 
 									// redo the request

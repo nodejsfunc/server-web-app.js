@@ -37,6 +37,10 @@ module.exports = function(req, res, next){
 		var _isAdminCreditService = function(){
 			return req.options.path.indexOf(constants.ADMIN_PATH) === 0 && req.options.path.indexOf(constants.ADMIN_CREDIT_PATH) !== -1;
 		};
+
+    var _isVoucherRedemptionService = function(){
+      return req.options.path.indexOf(constants.VOUCHER_REDEMPTION_PATH) === 0;
+    };
 	
 		if((_isCreditCardService() ||
 			_isBasketService() ||
@@ -44,6 +48,7 @@ module.exports = function(req, res, next){
 			_isClubcardService() ||
 			_isClubcardValidationService() ||
 			_isLibraryService() ||
+      _isVoucherRedemptionService ||
 			_isAdminCreditService()) &&
 			req.headers['x-content-type'] && req.options.host === config.api_domains['secure-service'].options.host
 		){

@@ -17,14 +17,14 @@
 		"affiliateWindow": {
 			"merchantID": "5997"
 		},
-		"nonSecureServicesDomain": "api.blinkboxbooks.com"
+		"nonSecureServicesDomain": "api.dev.bbbtest2.com"
 	},
 	"domains": {
 		"service": {
 			"root": "service",
 			"options": {
-				"host": "api.blinkboxbooks.com",
-				"port": 80,
+				"host": "api.dev.bbbtest2.com",
+				"port": 443,
 				"headers": {
 				}
 			}
@@ -32,7 +32,7 @@
 		"secure-service": {
 			"root": "service",
 			"options": {
-				"host": "origin-api.blinkboxbooks.com",
+				"host": "api.dev.bbbtest2.com",
 				"port": 443,
 				"headers": {
 				}
@@ -41,7 +41,7 @@
 		"auth": {
 			"root": "",
 			"options": {
-				"host":	 "auth.blinkboxbooks.com",
+				"host":	 "auth.dev.bbbtest2.com",
 				"port":	 443,
 				"headers": {
 				}
@@ -50,7 +50,7 @@
 		"resource": {
 			"root": "",
 			"options": {
-				"host": "media.blinkboxbooks.com",
+				"host": "media.dev.bbbtest2.com",
 				"port": 80,
 				"headers": {
 				}
