@@ -53,7 +53,7 @@ module.exports = function(req, res, next){
   // if present, translate access_token cookie to OAuth2 Authorisation header with bearer token
   // NOTE: the node app may be communicating with services behind the same firewall or on a different domain entirely (as is the case with nodejs-internal)
   // so we don't want to add the OAUTH2 header if communicating on port 80
-  if (req.cookies.hasOwnProperty(constants.AUTH_ACCESS_TOKEN_NAME) && options.port !== 80) {
+  if (req.cookies.hasOwnProperty(constants.AUTH_ACCESS_TOKEN_NAME)) {
     headers.Authorization = 'Bearer '+ req.cookies[constants.AUTH_ACCESS_TOKEN_NAME];
   }
 
