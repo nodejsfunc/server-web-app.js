@@ -19,7 +19,7 @@ describe('User request', function(){
 		app.use(cookieParser());
 		app.use(function(req, res, next){
 			req.options = {
-				host: config.api_domains.auth.options.host,
+				host: config.domains.auth.options.host,
 				path: '/users'
 			};
 			req.cookies.access_token = 'some token';
@@ -50,7 +50,7 @@ describe('User request', function(){
 						grant_type: constants.AUTH_REFRESH_TOKEN_NAME
 					}),
 					options = {
-						host: config.api_domains.auth.options.host,
+						host: config.domains.auth.options.host,
 						port: 443,
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded',

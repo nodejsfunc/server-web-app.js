@@ -14,7 +14,7 @@ var express = require('express'),
 
 describe('Handle 401', function(){
 
-	var server, domains = Object.keys(config.api_domains);
+	var server, domains = Object.keys(config.domains);
 
 	beforeEach(function(){
 		var app = express();
@@ -33,9 +33,9 @@ describe('Handle 401', function(){
 	});
 
 	var _test = function(domain){
-		if(config.api_domains[domain].options.port === 443){
+		if(config.domains[domain].options.port === 443){
 			it('should automatically refresh token and set new cookie for /' + domain + '/path', function(done){
-				var api = config.api_domains[domain],
+				var api = config.domains[domain],
 					test = (api.root && '/' + api.root) + '/' + path;
 
 				// original request mocked with 401 response and invalid token header
@@ -47,7 +47,7 @@ describe('Handle 401', function(){
 					});
 
 				// when attempting to refresh the token, return a new token
-				nock('https://' + config.api_domains.auth.options.host)
+				nock('https://' + config.domains.auth.options.host)
 					.post(constants.REFRESH_TOKEN_PATH)
 					.reply(200, mocks.TOKEN_RESPONSE);
 

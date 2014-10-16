@@ -45,7 +45,7 @@ module.exports = function(req, res, next){
 			_isClubcardValidationService() ||
 			_isLibraryService() ||
 			_isAdminCreditService()) &&
-			req.headers['x-content-type'] && req.options.host === config.api_domains['secure-service'].options.host
+			req.headers['x-content-type'] && req.options.host === config.domains['secure-service'].options.host
 		){
 			// change the content type
 			req.options.headers['content-type'] = req.headers['x-content-type'];

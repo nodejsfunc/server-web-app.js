@@ -7,7 +7,7 @@ var config = require('./../config/config'),
 	querystring = require('querystring');
 
 module.exports = function(req, res, next){
-	if(req.options.host === config.api_domains.auth.options.host && req.method === 'GET' &&
+	if(req.options.host === config.domains.auth.options.host && req.method === 'GET' &&
 		(req.options.path === '/users' || req.options.path.substr(0, 7) === '/users?')){
 		// accessing the users service
 		if(req.cookies.hasOwnProperty(constants.AUTH_ACCESS_TOKEN_NAME)){
@@ -28,7 +28,7 @@ module.exports = function(req, res, next){
 						};
 						req.body = querystring.stringify(post_data);
 						// Return user data from /oauth/token endpoint (workaround for /users/{id} requiring critical elevation):
-						req.options = extend(true, {}, config.api_domains.auth.options);
+						req.options = extend(true, {}, config.domains.auth.options);
 						req.options.path = constants.REFRESH_TOKEN_PATH;
 						req.options.method = 'POST';
 						req.options.headers = {
