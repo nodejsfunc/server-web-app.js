@@ -56,7 +56,7 @@ describe('Local routing', function(){
 	});
 
 	it('should remove access_token cookie', function(done){
-    nock('https://' + config.api_domains.auth.options.host)
+    nock('https://' + config.domains.auth.options.host)
       .post(constants.REVOKE_REFRESH_TOKEN)
       .reply(200);
 
@@ -68,7 +68,7 @@ describe('Local routing', function(){
 	});
 
   it('should remove access_token from repository', function(done){
-    nock('https://' + config.api_domains.auth.options.host)
+    nock('https://' + config.domains.auth.options.host)
         .post(constants.REVOKE_REFRESH_TOKEN)
         .reply(200);
 
@@ -86,7 +86,7 @@ describe('Local routing', function(){
   });
 
   it('should revoke refresh_token on the auth server', function(done){
-    var authServer = nock('https://' + config.api_domains.auth.options.host)
+    var authServer = nock('https://' + config.domains.auth.options.host)
         .post(constants.REVOKE_REFRESH_TOKEN)
         .reply(200);
 
@@ -100,7 +100,7 @@ describe('Local routing', function(){
   });
 
   it('should fail when we cannot revoke the refresh_token on the auth server', function(done){
-    nock('https://' + config.api_domains.auth.options.host)
+    nock('https://' + config.domains.auth.options.host)
       .post(constants.REVOKE_REFRESH_TOKEN)
       .reply(500);
 

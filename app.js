@@ -20,7 +20,7 @@ app.use(middleware.csrfHeader);
 app.use(middleware.poweredByHeader);
 app.use(bodyParser());
 app.use(cookieParser());
-app.use(timeout(config.api_timeout * 1000));
+app.use(timeout((config.timeout || 10) * 1000));
 
 // Register routes
 app.use(constants.LOCAL_PATH, routes.local);

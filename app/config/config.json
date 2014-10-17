@@ -17,6 +17,9 @@
 		"affiliateWindow": {
 			"merchantID": "5997"
 		},
+		"facebook": {
+			"pixelId": "709329549102487"
+		},
 		"nonSecureServicesDomain": "api.blinkboxbooks.com"
 	},
 	"domains": {

@@ -19,7 +19,7 @@ module.exports = function(req, res, next){
     return next('No path specified');
   }
 
-  var domain = config.api_domains[req.params.domain], path = req.params[0], options = extend(true, {}, domain.options);
+  var domain = config.domains[req.params.domain], path = req.params[0], options = extend(true, {}, domain.options);
   if (params) {
     path = path + '?' + params;
   }

@@ -6,10 +6,10 @@ var Q = require('q');
 var request = require('request');
 
 function revokeRefreshTokenURL(){
-  var port = config.api_domains.auth.options.port;
+  var port = config.domains.auth.options.port;
   var scheme = (port === 443) ? 'https' : 'http';
 
-  return scheme + '://' + config.api_domains.auth.options.host + ':' + port + constants.REVOKE_REFRESH_TOKEN;
+  return scheme + '://' + config.domains.auth.options.host + ':' + port + constants.REVOKE_REFRESH_TOKEN;
 }
 
 module.exports = {

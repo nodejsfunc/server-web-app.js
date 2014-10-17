@@ -12,7 +12,7 @@ var express = require('express'),
 
 describe('Options ', function(){
 
-	var server, domains = Object.keys(config.api_domains);
+	var server, domains = Object.keys(config.domains);
 
 	beforeEach(function(){
 		var app = express();
@@ -37,7 +37,7 @@ describe('Options ', function(){
 
 			// build expected options
 			// should derive from the original static options
-			var options = extend(true, {}, config.api_domains[domain].options);
+			var options = extend(true, {}, config.domains[domain].options);
 
 			// should have original request headers (default and custom)
 			options.headers = {
@@ -48,7 +48,7 @@ describe('Options ', function(){
 			options.method = 'GET';
 
 			// should include path
-			options.path = (config.api_domains[domain].root && '/' + config.api_domains[domain].root) + '/path';
+			options.path = (config.domains[domain].root && '/' + config.domains[domain].root) + '/path';
 
 			// should transform cookie into auth header
 			if (options.port !== 80) {

@@ -17,7 +17,7 @@ var express = require('express'),
 
 describe('Services', function(){
 
-	var server, i, l, domains = Object.keys(config.api_domains);
+	var server, i, l, domains = Object.keys(config.domains);
 
 	beforeEach(function(){
 		var app = express();
@@ -32,15 +32,15 @@ describe('Services', function(){
 	});
 
 	var _proxyTest = function(domain){
-		var	proxy = config.api_domains[domain].options.port === 443 ? 'https' : 'http';
-		proxy += '://' + config.api_domains[domain].options.host;
+		var	proxy = config.domains[domain].options.port === 443 ? 'https' : 'http';
+		proxy += '://' + config.domains[domain].options.host;
 
 		describe('should make proxy requests for /' + domain + '/path', function(){
 			var _test = function(method){
 				it(method.toUpperCase(), function(done){
 					// mock proxy request
 					nock(proxy)
-						.intercept((config.api_domains[domain].root && '/' + config.api_domains[domain].root) + '/' + mock.path, method)
+						.intercept((config.domains[domain].root && '/' + config.domains[domain].root) + '/' + mock.path, method)
 						.reply(200, mock.response);
 
 					request[method]('/' + domain + '/' + mock.path)
@@ -60,15 +60,15 @@ describe('Services', function(){
 
 
 	var _headerTest = function(domain){
-		var	proxy = config.api_domains[domain].options.port === 443 ? 'https' : 'http';
-		proxy += '://' + config.api_domains[domain].options.host;
+		var	proxy = config.domains[domain].options.port === 443 ? 'https' : 'http';
+		proxy += '://' + config.domains[domain].options.host;
 
 		describe('should copy request headers and return proxy response headers for /' + domain + '/path', function(){
 			var _test = function(method){
 				it(method.toUpperCase(), function(done){
 					// mock proxy request
 					nock(proxy)
-						.intercept((config.api_domains[domain].root && '/' + config.api_domains[domain].root) + '/' + mock.path, method)
+						.intercept((config.domains[domain].root && '/' + config.domains[domain].root) + '/' + mock.path, method)
 						.matchHeader('x-server-request', 'blinkbox')
 						.reply(200, mock.response, {
 							'x-server-response': 'blinkbox'
@@ -93,8 +93,8 @@ describe('Services', function(){
 	methods = ['post', 'patch']; // only testing these methods now
 
 	var _bodyTest = function(domain){
-		var	proxy = config.api_domains[domain].options.port === 443 ? 'https' : 'http';
-		proxy += '://' + config.api_domains[domain].options.host;
+		var	proxy = config.domains[domain].options.port === 443 ? 'https' : 'http';
+		proxy += '://' + config.domains[domain].options.host;
 
 		describe('should send the body of the request with the proxy for /' + domain + '/path', function(){
 			var _test = function(method){
@@ -102,7 +102,7 @@ describe('Services', function(){
 					// mock proxy request
 					// the body is transformed by nodejs using the querystring
 					nock(proxy)
-						.intercept((config.api_domains[domain].root && '/' + config.api_domains[domain].root) + '/' + mock.path, method, querystring.stringify(mock.request))
+						.intercept((config.domains[domain].root && '/' + config.domains[domain].root) + '/' + mock.path, method, querystring.stringify(mock.request))
 						.reply(200, mock.response);
 
 					request[method]('/' + domain + '/' + mock.path)

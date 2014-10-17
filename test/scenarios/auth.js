@@ -14,7 +14,7 @@ var express = require('express'),
 
 describe('Auth', function(){
 
-	var server, auth = config.api_domains.auth;
+	var server, auth = config.domains.auth;
 
 	beforeEach(function(){
 		var app = express();

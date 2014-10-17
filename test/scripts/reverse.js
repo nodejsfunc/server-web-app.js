@@ -26,7 +26,7 @@ describe('Reverse', function(){
 		var app = express();
 		app.use('/:domain/*', function(req, res, next){
 			req.options = {
-				host: config.api_domains['secure-service'].options.host,
+				host: config.domains['secure-service'].options.host,
 				path: req.params[0],
 				headers: {}
 			};
