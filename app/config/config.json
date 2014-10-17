@@ -49,15 +49,6 @@
 				"headers": {
 				}
 			}
-		},
-		"resource": {
-			"root": "",
-			"options": {
-				"host": "media.blinkboxbooks.com",
-				"port": 80,
-				"headers": {
-				}
-			}
 		}
 	}
 }
