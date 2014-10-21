@@ -22,8 +22,6 @@ router
 		// Make the proxy HTTP request
     var proxy_scheme;
 
-    req.options.port = 443;
-
     if (req.options.port === 443) {
       proxy_scheme = https;
       logger.info('Using HTTPS proxy scheme.');
