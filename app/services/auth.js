@@ -1,11 +1,12 @@
 'use strict';
 
-var config = require('./../config/config');
 var constants = require('../../app/config/constants');
 var Q = require('q');
 var request = require('request');
 
 function revokeRefreshTokenURL(){
+	// Require config here so it reflects invalidation of the require cache on SIGHUP:
+	var config = require('./../config/config');
   var port = config.domains.auth.options.port;
   var scheme = (port === 443) ? 'https' : 'http';
 

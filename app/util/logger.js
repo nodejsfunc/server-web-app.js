@@ -1,6 +1,7 @@
 'use strict';
 
 var graylog2 = require('graylog2'),
+		// Logger config will not be refreshed on require cache invalidation:
 		config = require('../config/config'),
 		logger,
 		loggerMap,

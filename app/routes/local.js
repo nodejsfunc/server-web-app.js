@@ -2,7 +2,6 @@
 
 var express = require('express'),
 	constants = require('./../config/constants'),
-	config = require('./../config/config'),
 	repository = require('./../util/repository'),
 	logger = require('./../util/logger'),
 	router = express.Router();
@@ -37,6 +36,8 @@ router
     }, errorHandler);
 	})
 	.get(constants.CLIENT_CONFIG_PATH, function (req, res) {
+		// Require client config here so it reflects invalidation of the require cache on SIGHUP:
+		var config = require('./../config/config');
 		res.send(200, config.clientConfig);
 	})
 	.post(constants.LOG_PATH, function (req, res) {

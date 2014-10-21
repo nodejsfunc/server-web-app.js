@@ -4,14 +4,15 @@ var express = require('express'),
 	bodyParser = require('body-parser'),
 	cookieParser = require('cookie-parser'),
 	timeout = require('connect-timeout'),
+	path = require('path'),
 	port = process.env.PORT || 3000,
 	constants = require('./app/config/constants'),
+	// New Relic and timeout config will not be refreshed on require cache invalidation:
 	config = require('./app/config/config'),
 	middleware = require('./app/scripts'),
 	routes = require('./app/routes'),
 	logger = require('./app/util/logger');
 
-// Configure application
 var app = express();
 
 app.enable('trust proxy'); // required for nginx
@@ -32,6 +33,12 @@ app.use(middleware.error);
 if (config.newRelicKey) {
 	require('newrelic');
 }
+
+process.on('SIGHUP', function() {
+	logger.notice('Express server configuration reload');
+	// Clear the config from require cache:
+	delete require.cache[path.resolve('./app/config/config.json')];
+});
 
 process.on('SIGINT', function() {
 	logger.notice('Express server shutting down');
