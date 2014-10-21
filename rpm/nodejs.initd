@@ -20,6 +20,18 @@ function restart {
         start
 }
 
+function reload {
+        pid=$( pgrep -f app.js -u $NODEJS_USER )
+        if [ "${pid}" != "" ]; then
+                echo "sending SIGHUP to node app"
+                kill -s HUP ${pid}
+                exit 0
+        else
+                echo "node is not running"
+                exit 1
+        fi
+}
+
 function status {
         pid=$( pgrep -f app.js -u $NODEJS_USER )
         if [ "${pid}" != "" ]; then
