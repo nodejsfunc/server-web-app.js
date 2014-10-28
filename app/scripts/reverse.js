@@ -5,6 +5,7 @@ var constants = require('./../config/constants'),
 	querystring = require('querystring');
 
 module.exports = function(req, res, next){
+
 	// the bodyparser of express.js is unable to parse anything other than JSON or form parameters (req.body is empty)
 	// to enable custom content-types, that send raw data, we must set the accept header to the desired content-type (set by the request in Accept)
 	// this app will replace the content type AFTER the bodyparser received the data in req.body
@@ -41,14 +42,14 @@ module.exports = function(req, res, next){
     var _isVoucherRedemptionService = function(){
       return req.options.path.indexOf(constants.VOUCHER_REDEMPTION_PATH) === 0;
     };
-	
+
 		if((_isCreditCardService() ||
 			_isBasketService() ||
 			_isPurchaseService() ||
 			_isClubcardService() ||
 			_isClubcardValidationService() ||
 			_isLibraryService() ||
-      _isVoucherRedemptionService ||
+      _isVoucherRedemptionService() ||
 			_isAdminCreditService()) &&
 			req.headers['x-content-type'] && req.options.host === config.api_domains['secure-service'].options.host
 		){
