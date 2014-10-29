@@ -7,7 +7,7 @@ var express = require('express'),
 
 describe('Domain', function(){
 
-	var server, domains = Object.keys(config.api_domains);
+	var server, domains = Object.keys(config.domains);
 
 	beforeEach(function(){
 		var app = express();

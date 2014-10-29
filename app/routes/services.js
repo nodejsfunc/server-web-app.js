@@ -196,9 +196,9 @@ router
 
 		var _refreshTokenOptions = function(post_data){
 			return {
-				host: config.api_domains.auth.options.host,
+				host: config.domains.auth.options.host,
 				path: constants.REFRESH_TOKEN_PATH,
-				port: config.api_domains.auth.options.port,
+				port: config.domains.auth.options.port,
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/x-www-form-urlencoded',
