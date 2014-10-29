@@ -49,7 +49,6 @@
 				"headers": {
 				}
 			}
-<<<<<<< HEAD
 		},
 		"resource": {
 			"root": "",
@@ -59,8 +58,6 @@
 				"headers": {
 				}
 			}
-=======
->>>>>>> upstream/master
 		}
 	}
 }
