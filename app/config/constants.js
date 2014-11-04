@@ -21,6 +21,7 @@ module.exports = {
 	CLIENT_CONFIG_PATH: '/config',
 	LOG_PATH: '/log',
 	CREDIT_CARD_PATH: '/service/my/creditcards',
+  VOUCHER_REDEMPTION_PATH: '/service/gifting/voucher/',
 	BASKET_PATH: '/service/my/baskets',
 	PURCHASE_PATH: '/service/my/payments',
 	CLUBCARD_PATH: '/service/my/clubcards',
