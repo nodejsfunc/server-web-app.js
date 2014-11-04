@@ -34,6 +34,8 @@ if (config.newRelicKey) {
 	require('newrelic');
 }
 
+// Allow configuration reload on SIGHUP, see:
+// http://jira.blinkbox.local/jira/browse/SWA-74
 process.on('SIGHUP', function() {
 	logger.notice('Express server configuration reload');
 	// Clear the config from require cache:
