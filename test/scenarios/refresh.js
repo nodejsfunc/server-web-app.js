@@ -34,7 +34,7 @@ describe('Handle 401', function(){
 
 	var _test = function(domain, reason){
 		if(config.domains[domain].options.port === 443){
-			it('should automatically refresh token and set new cookie for /' + domain + '/path when 401 returns "' + reason + '"', function(done){
+			it('should automatically refresh token and set new cookie for /' + domain + '/path', function(done){
 				var api = config.domains[domain],
 					test = (api.root && '/' + api.root) + '/' + path;
 
@@ -68,8 +68,6 @@ describe('Handle 401', function(){
 	};
 
 	domains.forEach(function(domain){
-		[constants.INVALID_TOKEN, constants.EXPIRED_TOKEN, constants.UNVERIFIED_IDENTITY].forEach(function(reason){
-			_test(domain, reason);
-		});
+		_test(domain, 'Bearer Invalid token');
 	});
 });
