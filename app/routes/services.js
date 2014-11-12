@@ -86,7 +86,10 @@ router
 			});
 
 			proxy_response.on('end', function() {
-        logger.info('Request done');
+				logger.info('Request done', {
+					requestOptions: req.options,
+					responseHeaders: proxy_response.headers
+				});
 				if (!chunked) {
 					var response_body = Buffer.concat(buffers);
 					// If appropriate, translate the authentication OAuth2 bearer token back to a cookie
