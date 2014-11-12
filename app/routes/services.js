@@ -274,9 +274,9 @@ router
 				}
 
 				// if token invalid/expired
-				var error_message = proxy_response.headers['www-authenticate'] || '';
-				if(proxy_response.statusCode === 401 && (error_message.indexOf(constants.INVALID_TOKEN) !== -1 || error_message.indexOf(constants.EXPIRED_TOKEN) !== -1)){
-          logger.info('Access token is invalid, refreshing.');
+				var error_message = proxy_response.headers['www-authenticate'];
+				if(proxy_response.statusCode === 401 && error_message && error_message !== constants.NO_TOKEN){
+					logger.info('Access token is invalid, refreshing.');
 
 					// get refresh token for the invalid token
 					if(req.options.headers.Authorization){

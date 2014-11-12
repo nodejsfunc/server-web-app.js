@@ -32,7 +32,7 @@ describe('Handle 401', function(){
 		server.close();
 	});
 
-	var _test = function(domain){
+	var _test = function(domain, reason){
 		if(config.domains[domain].options.port === 443){
 			it('should automatically refresh token and set new cookie for /' + domain + '/path', function(done){
 				var api = config.domains[domain],
@@ -43,7 +43,7 @@ describe('Handle 401', function(){
 					.get(test)
 					.matchHeader('Authorization', 'Bearer some token')
 					.reply(401, {}, {
-						'www-authenticate': constants.INVALID_TOKEN
+						'www-authenticate': reason
 					});
 
 				// when attempting to refresh the token, return a new token
@@ -67,8 +67,7 @@ describe('Handle 401', function(){
 		}
 	};
 
-	for(var i = 0, l = domains.length; i < l; i++){
-		_test(domains[i]);
-	}
-
+	domains.forEach(function(domain){
+		_test(domain, 'Bearer Invalid token');
+	});
 });
