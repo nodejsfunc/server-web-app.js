@@ -101,7 +101,7 @@ router
 			if(response instanceof Error){
 				// This is actually an error!
 				log.stack = response.stack;
-				logger.error(message + " threw " + response.toString(), log);
+				logger.error(message + ' threw ' + response.toString(), log);
 				return;
 			}
 
