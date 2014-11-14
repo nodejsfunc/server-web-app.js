@@ -60,6 +60,7 @@ router
 			log = {
 				proxyRequest: true,
 				userId: request._userId,
+				httpUrl: url,
 				timestamp: timestamp,
 				datetime: datetime,
 				httpClientIP: '127.0.0.1', // yes, SWA is localhost.
@@ -67,8 +68,8 @@ router
 				httpVersion: response.httpVersionMajor + '.' + response.httpVersionMinor,
 				httpStatus: status,
 				httpStatusName: http.STATUS_CODES[status],
-				httpPathAndQuery: url,
-				httpPath: options.path,
+				httpPathAndQuery: options.path,
+				httpPath: typeof options.path === 'string' ? options.path.split('?')[0] : options.path,  // options.path includes query
 				httpAcceptEncoding: options.headers['accept-encoding'],
 				httpUserAgent: options.headers['user-agent'],
 				httpVia: response.headers.via,
