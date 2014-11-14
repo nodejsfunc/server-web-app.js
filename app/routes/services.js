@@ -65,6 +65,8 @@ router
 				datetime: datetime,
 				httpClientIP: '127.0.0.1', // yes, SWA is localhost.
 				httpMethod: options.method,
+				httpPort: options.port,
+				httpHost: options.host,
 				httpVersion: response.httpVersionMajor + '.' + response.httpVersionMinor,
 				httpStatus: status,
 				httpStatusName: http.STATUS_CODES[status],
