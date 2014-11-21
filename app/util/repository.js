@@ -1,6 +1,7 @@
 'use strict';
 
 var constants = require('./../config/constants'),
+	// Redis config will not be refreshed on require cache invalidation:
 	config = require('./../config/config'),
 	redis = require('redis').createClient(config.databasePort, config.databaseDomain),
 	logger = require('./../util/logger'),

@@ -5,21 +5,24 @@
  * This object will be used later, therefore it will be saved as part of the request.
  * */
 
-var config = require('./../config/config'),
-    constants = require('./../config/constants'),
+var constants = require('./../config/constants'),
     url = require('url'),
     extend = require('extend');
 
 module.exports = function(req, res, next){
-
-  // Making use of url.parse to retrieve the query params instead of  just using req.query, as the latter encodes the string parameters, but we need the query string unencoded
+	// Making use of url.parse to retrieve the query params instead of just using req.query,
+	// as the latter encodes the string parameters, but we need the query string unencoded:
   var params = url.parse(req.url).query;
 
   if(!req.params || !req.params[0]){
     return next('No path specified');
   }
 
-  var domain = config.domains[req.params.domain], path = req.params[0], options = extend(true, {}, domain.options);
+	// Require config here so it reflects invalidation of the require cache on SIGHUP:
+  var config = require('./../config/config'),
+	    domain = config.domains[req.params.domain],
+	    path = req.params[0],
+	    options = extend(true, {}, domain.options);
   if (params) {
     path = path + '?' + params;
   }

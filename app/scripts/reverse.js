@@ -1,10 +1,11 @@
 'use strict';
 
 var constants = require('./../config/constants'),
-	config = require('./../config/config'),
-	querystring = require('querystring');
+		querystring = require('querystring');
 
 module.exports = function(req, res, next){
+	// Require config here so it reflects invalidation of the require cache on SIGHUP:
+	var config = require('./../config/config');
 
 	// the bodyparser of express.js is unable to parse anything other than JSON or form parameters (req.body is empty)
 	// to enable custom content-types, that send raw data, we must set the accept header to the desired content-type (set by the request in Accept)

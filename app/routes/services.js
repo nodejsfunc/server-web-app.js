@@ -2,7 +2,6 @@
 
 var express = require('express'),
 	constants = require('./../config/constants'),
-	config = require('./../config/config'),
 	repository = require('./../util/repository'),
 	logger = require('./../util/logger'),
 	middleware = require('./../scripts'),
@@ -277,6 +276,8 @@ router
 		};
 
 		var _refreshTokenOptions = function(post_data){
+			// Require config here so it reflects invalidation of the require cache on SIGHUP:
+			var config = require('./../config/config');
 			return {
 				host: config.domains.auth.options.host,
 				path: constants.REFRESH_TOKEN_PATH,

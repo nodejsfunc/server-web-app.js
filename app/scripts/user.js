@@ -1,12 +1,13 @@
 'use strict';
 
-var config = require('./../config/config'),
-	constants = require('./../config/constants'),
+var constants = require('./../config/constants'),
 	repository = require('./../util/repository'),
 	extend = require('extend'),
 	querystring = require('querystring');
 
 module.exports = function(req, res, next){
+	// Require config here so it reflects invalidation of the require cache on SIGHUP:
+	var config = require('./../config/config');
 	if(req.options.host === config.domains.auth.options.host && req.method === 'GET' &&
 		(req.options.path === '/users' || req.options.path.substr(0, 7) === '/users?')){
 		// accessing the users service

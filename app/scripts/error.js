@@ -1,6 +1,7 @@
 'use strict';
 
 var logger = require('./../util/logger'),
+		// New Relic config will not be refreshed on require cache invalidation:
 		config = require('./../config/config');
 
 module.exports = function (err, req, res, next) {
