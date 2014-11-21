@@ -11,6 +11,7 @@ var express = require('express'),
 	https = require('https'),
 	extend = require('extend'),
 	querystring = require('querystring'),
+	crypto = require('crypto'),
 	path = '/:domain/*';
 
 router
@@ -20,16 +21,7 @@ router
 	.use(path, middleware.user) // handle special case of /users/ requests
 	.use(path, function(req, res){
 		// Make the proxy HTTP request
-    var proxy_scheme;
-
-    if (req.options.port === 443) {
-      proxy_scheme = https;
-      logger.info('Using HTTPS proxy scheme.');
-    }
-    else {
-      proxy_scheme = http;
-      logger.info('Using HTTP proxy scheme.');
-    }
+    var proxy_scheme = req.options.port === 443 ? https : http;
 
 		// make proxy request
 		var _updateAccessToken = function(oldAT, newAT, obj){
@@ -41,6 +33,82 @@ router
 
 			// set the access/refresh token in the key/value store
 			repository.set(newAT, JSON.stringify(obj));
+		};
+
+		var _logProxyRequest = function(request, response) {
+			var message, log, logType, timestamp, datetime, appTime, status, url, options;
+
+			options = request.__options;
+			timestamp = Date.now();
+			datetime = new Date(timestamp);
+			appTime = timestamp - request.__start_timestamp;
+			status = +response.statusCode;
+
+			// if this is an error, headers is undefined
+			response.headers = response.headers || {};
+
+			url = (options.port === 443 ? 'https://' : 'http://') + options.host + ':' + options.port + options.path;
+
+			if (status >= 500) {
+				logType = 'error';
+			} else if (status >= 400 && status !== 401) {
+				logType = 'warn';
+			} else {
+				logType = 'info';
+			}
+
+			log = {
+				proxyRequest: true,
+				userId: request._userId,
+				httpUrl: url,
+				timestamp: timestamp,
+				datetime: datetime,
+				httpClientIP: '127.0.0.1', // yes, SWA is localhost.
+				httpMethod: options.method,
+				httpPort: options.port,
+				httpHost: options.host,
+				httpVersion: response.httpVersionMajor + '.' + response.httpVersionMinor,
+				httpStatus: status,
+				httpStatusName: http.STATUS_CODES[status],
+				httpPathAndQuery: options.path,
+				httpPath: typeof options.path === 'string' ? options.path.split('?')[0] : options.path,  // options.path includes query
+				httpAcceptEncoding: options.headers['accept-encoding'],
+				httpUserAgent: options.headers['user-agent'],
+				httpVia: response.headers.via,
+				httpXForwardedFor: options.headers['x-forwarded-for'],
+				httpXRequestedWith: options.headers['x-requested-with'],
+				httpXRequestedBy: options.headers['x-requested-by'],
+				httpCacheControl: response.headers['cache-control'],
+				httpContentLength: +response.headers['content-length'],
+				httpWWWAuthenticate: response.headers['www-authenticate'],
+				httpApplicationTime: appTime
+			};
+
+			if(options.headers.Authorization){
+				var shasum = crypto.createHash('sha1');
+				shasum.update(options.headers.Authorization, 'utf8');
+				log.httpAuthorizationHash = shasum.digest('hex');
+			}
+
+			message = [
+				'PROXY',
+				log.httpMethod,
+				log.httpPathAndQuery,
+				'returned',
+				log.httpStatus,
+				log.httpStatusName,
+				'in',
+				log.httpApplicationTime + 'ms'
+			].join(' ');
+
+			if(response instanceof Error){
+				// This is actually an error!
+				log.stack = response.stack;
+				logger.error(message + ' threw ' + response.toString(), log);
+				return;
+			}
+
+			logger[logType](message, log);
 		};
 
 		/**
@@ -58,7 +126,9 @@ router
 			var response_headers = {};
 			// copy accross headers from proxy response to response
 			for (var header in proxy_response.headers) {
-				response_headers[header] = proxy_response.headers[header];
+				if(proxy_response.headers.hasOwnProperty(header)){
+					response_headers[header] = proxy_response.headers[header];
+				}
 			}
 
 			// transform API services content-type to application/json
@@ -72,7 +142,9 @@ router
 				res.writeHead(proxy_response.statusCode, response_headers);
 			} else {
 				for(var index in response_headers){
-					res.setHeader(index, response_headers[index]);
+					if(response_headers.hasOwnProperty(index)){
+						res.setHeader(index, response_headers[index]);
+					}
 				}
 				res.status(proxy_response.statusCode);
 			}
@@ -86,7 +158,6 @@ router
 			});
 
 			proxy_response.on('end', function() {
-        logger.info('Request done');
 				if (!chunked) {
 					var response_body = Buffer.concat(buffers);
 					// If appropriate, translate the authentication OAuth2 bearer token back to a cookie
@@ -173,24 +244,35 @@ router
 		 * @param options request options
 		 * @param onSuccess function to call on successful request
 		 * @param onError function to call on failure request
+		 * @param cookie a cookie to include in the proxy request
 		 * @returns {*} return the response object
 		 * @private
 		 */
-		var _request = function(options, onSuccess, onError, cookie){
-			var request = proxy_scheme.request(extend({}, options), function(proxy_response){
-				if(res.headersSent){
+		var _request = function (options, onSuccess, onError, cookie) {
+			var request = proxy_scheme.request(extend({}, options));
+
+			// Used later in the logProxyRequest method to find out how long the request took
+			request.__start_timestamp = Date.now();
+			request.__options = extend({}, options);
+
+			request.on('response', function(proxy_response){
+				_logProxyRequest(request, proxy_response);
+				if (res.headersSent) {
 					return;
 				}
 				// update cookie on success
-				if(cookie && proxy_response.statusCode === 200){
+				if (cookie && proxy_response.statusCode === 200) {
 					res.cookie(cookie.name, cookie.value, cookie.prop);
 				}
 				onSuccess(proxy_response);
-			}).on('error', function(err){
-					if(typeof onError === 'function'){
-						onError(err);
-					}
-				});
+			});
+
+			request.on('error', function (err) {
+				_logProxyRequest(request, err);
+				if (typeof onError === 'function') {
+					onError(err);
+				}
+			});
 			return request;
 		};
 
@@ -266,8 +348,6 @@ router
 		var proxy_request = _request(req.options,
 			// on success
 			function(proxy_response){
-        logger.info('Proxy response successful.');
-
 				// do not continue if the response has already been sent (example timeout)
 				if(res.headersSent){
 					return;
