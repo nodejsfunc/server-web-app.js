@@ -1,5 +1,15 @@
 'use strict';
 
+process.on('SIGINT', function() {
+	logger.notice('SIGINT received. Express server shutting down');
+	process.exit();
+});
+
+
+process.on('exit', function(code){
+	logger.warn('Node.js server exiting with error code: ' + code);
+});
+
 var express = require('express'),
 	bodyParser = require('body-parser'),
 	cookieParser = require('cookie-parser'),
@@ -33,10 +43,6 @@ if (config.newRelicKey) {
 	require('newrelic');
 }
 
-process.on('SIGINT', function() {
-	logger.notice('Express server shutting down');
-	process.exit();
-});
 
 // Start server
 app.listen(port);
