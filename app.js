@@ -1,14 +1,5 @@
 'use strict';
 
-process.on('SIGINT', function() {
-	logger.notice('SIGINT received. Express server shutting down');
-	process.exit();
-});
-
-
-process.on('exit', function(code){
-	logger.warn('Node.js server exiting with error code: ' + code);
-});
 
 var express = require('express'),
 	bodyParser = require('body-parser'),
@@ -20,6 +11,17 @@ var express = require('express'),
 	middleware = require('./app/scripts'),
 	routes = require('./app/routes'),
 	logger = require('./app/util/logger');
+
+process.on('SIGINT', function() {
+	logger.notice('SIGINT received. Express server shutting down');
+	process.exit();
+});
+
+
+process.on('exit', function(code){
+	logger.warn('Node.js server exiting with error code: ' + code);
+});
+
 
 // Configure application
 var app = express();
