@@ -1,5 +1,6 @@
 'use strict';
 
+
 var express = require('express'),
 	bodyParser = require('body-parser'),
 	cookieParser = require('cookie-parser'),
@@ -13,6 +14,26 @@ var express = require('express'),
 	routes = require('./app/routes'),
 	logger = require('./app/util/logger');
 
+// Allow configuration reload on SIGHUP, see:
+// http://jira.blinkbox.local/jira/browse/SWA-74
+process.on('SIGHUP', function () {
+	logger.notice('Express server configuration reload');
+	// Clear the config from require cache:
+	delete require.cache[path.resolve('./app/config/config.json')];
+});
+
+process.on('SIGINT', function () {
+	logger.notice('Express server shutting down');
+	process.exit();
+});
+
+process.on('exit', function (code) {
+	if (code) {
+		logger.warn('Node.js server exiting with error code: ' + code);
+	}
+});
+
+// Configure application
 var app = express();
 
 app.enable('trust proxy'); // required for nginx
@@ -33,19 +54,6 @@ app.use(middleware.error);
 if (config.newRelicKey) {
 	require('newrelic');
 }
-
-// Allow configuration reload on SIGHUP, see:
-// http://jira.blinkbox.local/jira/browse/SWA-74
-process.on('SIGHUP', function() {
-	logger.notice('Express server configuration reload');
-	// Clear the config from require cache:
-	delete require.cache[path.resolve('./app/config/config.json')];
-});
-
-process.on('SIGINT', function() {
-	logger.notice('Express server shutting down');
-	process.exit();
-});
 
 // Start server
 app.listen(port);
