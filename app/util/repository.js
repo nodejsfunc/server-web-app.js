@@ -8,7 +8,6 @@ var constants = require('./../config/constants'),
 	crypto = require('crypto');
 
 var start = process.hrtime();
-var end;
 
 function hash(obj){
 	if(typeof obj === 'string'){
