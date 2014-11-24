@@ -86,8 +86,8 @@ router
 
 			if(options.headers.Authorization){
 				var shasum = crypto.createHash('sha1');
-				shasum.update(options.headers.Authorization, 'utf8');
-				log.httpAuthorizationHash = shasum.digest('hex');
+				shasum.update(options.headers.Authorization.substr('Bearer '.length), 'utf8');
+				log.tokenHash = shasum.digest('hex');
 			}
 
 			message = [
