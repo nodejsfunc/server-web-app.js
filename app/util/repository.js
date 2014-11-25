@@ -81,9 +81,14 @@ module.exports = {
 				valueHash = hash(value);
 
 			// all redis entries are deleted after a certain time
-			logger.info('Redis: calling set - sha1(key): ' + keyHash + ', sha1(value): ' + valueHash + ', PX ' + constants.AUTH_MAX_AGE, {tokenHash: keyHash});
+			logger.info('Redis: calling set - sha1(key): ' + keyHash +
+			', sha1(value): ' + valueHash + ', Expires in ' + constants.AUTH_MAX_AGE + ' ms', {tokenHash: keyHash});
+
 			redis.set(key, value, 'PX', constants.AUTH_MAX_AGE, function(result){
-				logger.info('Redis: set - sha1(key): ' + keyHash + ', sha1(value): ' + valueHash + ', PX ' + constants.AUTH_MAX_AGE + '): Returned ' + hash(result), {tokenHash: keyHash});
+				logger.info('Redis: set - sha1(key): ' + keyHash +
+				', sha1(value): ' + valueHash + ', Expires in ' + constants.AUTH_MAX_AGE + ' ms): ' +
+				'Returned ' + hash(result), {tokenHash: keyHash});
+
 			});
 		} else {
 			logger.error('Invalid arguments for redis SET command. (key: "' + key + '", value: "' + value + '")');
@@ -94,7 +99,7 @@ module.exports = {
 		var keyHash = hash(key);
 		logger.info('Redis: Calling get key (sha1): ' +  keyHash);
 		redis.get(key, function(err, reply){
-			logger.info('Redis: get ' + keyHash + ' returned ' + hash(err? err : reply), {tokenHash: keyHash});
+			logger.info('Redis: get ' + keyHash + ' returned ' + (err? err : hash(reply)), {tokenHash: keyHash});
 			if(! err){
 				defer.resolve(reply);
 			} else {
@@ -107,8 +112,8 @@ module.exports = {
 	del: function(key){
 		var keyHash = hash(key);
 		logger.info('Redis: calling delete key (sha1): '+ keyHash, {tokenHash: keyHash});
-		redis.del(key || null, function(){
-			logger.info('Redis: delete ' + keyHash + ' returned '+ JSON.stringify(arguments), {tokenHash: keyHash} );
+		redis.del(key || null, function(err, res){
+			logger.info('Redis: delete ' + keyHash + ' returned '+ (err? ('Error: ' + err) : (res + ' keys deleted.') ), {tokenHash: keyHash} );
 		});
 	},
 	exists: function(key){
@@ -116,7 +121,7 @@ module.exports = {
 		var keyHash = hash(key);
 		logger.info('Redis: calling exists key (sha1): ' + keyHash, {tokenHash: keyHash} );
 		redis.exists(key, function(err, reply){
-			logger.info('Redis: exists ' + keyHash + ' returned ' + (err? err : reply), {tokenHash: keyHash});
+			logger.info('Redis: exists ' + keyHash + ' returned ' + (err? ('Error: ' + err) : reply), {tokenHash: keyHash});
 			if(!err){
 				defer.resolve(reply);
 			} else {
