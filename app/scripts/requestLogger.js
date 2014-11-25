@@ -2,7 +2,9 @@
 
 var finished = require('finished'),
 		http = require('http'),
-		logger = require('./../util/logger');
+		logger = require('./../util/logger'),
+		constants = require('./../config/constants.js'),
+		crypto = require('crypto');
 
 function responseTime(start) {
 	var diff = process.hrtime(start),
@@ -51,6 +53,13 @@ module.exports = function (req, res, next) {
 				log.httpApplicationTime + 'ms'
 			].join(' '),
 			logType = 'info';
+
+		if(req.cookies && req.cookies[constants.AUTH_ACCESS_TOKEN_NAME]){
+			var shasum = crypto.createHash('sha1');
+			shasum.update(req.cookies[constants.AUTH_ACCESS_TOKEN_NAME], 'utf8');
+			log.tokenHash = shasum.digest('hex');
+		}
+
 		if (statusCode >= 500) {
 			logType = 'error';
 		} else if (statusCode >= 400 && statusCode !== 401) {
