@@ -298,37 +298,34 @@ router
 		 * @private
 		 */
 		var _refreshToken = function(refresh_token, onSuccess, onError){
+			var noop = function(){};
+			onSuccess = onSuccess || noop;
+			onError = onError || noop;
 			var post_data = querystring.stringify({
 				refresh_token: refresh_token,
 				grant_type: constants.AUTH_REFRESH_TOKEN_NAME
 			});
 			var obj;
-			var post_req = _request(_refreshTokenOptions(post_data), function(response){
-				if(response.statusCode === 200){
-					response.on('data', function (chunk) {
+			var post_req = _request(_refreshTokenOptions(post_data), function(response) {
+				if (response.statusCode === 200) {
+					response.on('data', function(chunk) {
 						try{
 							obj = JSON.parse(chunk + '');
-						} catch(err){
-							if(typeof onError === 'function'){
-								onError('Invalid JSON when attempting to parse response body for refresh token');
-							}
+						} catch(err) {
+							onError('Invalid JSON when attempting to parse response body for refresh token.');
 						}
 					});
 					response.on('end', function() {
-						if(typeof onSuccess === 'function'){
+						if (obj) {
 							onSuccess(obj);
+						} else {
+							onError('No valid JSON data received for refresh token request.');
 						}
 					});
 				} else {
-					if(typeof onError === 'function'){
-						onError();
-					}
+					onError('Received error code ' + response.statusCode + 'in response to refresh token request.');
 				}
-			}, function(error){
-				if(typeof onError === 'function'){
-					onError(error);
-				}
-			});
+			}, onError);
 			post_req.write(post_data);
 			post_req.end();
 		};
@@ -362,49 +359,56 @@ router
 					// get refresh token for the invalid token
 					if(req.options.headers.Authorization){
 						var access_token = req.options.headers.Authorization.substr('Bearer '.length);
-
             logger.info('Attempting to get access token from repository.');
 						repository.get(access_token).then(function(value){
-							try{
-								var obj = JSON.parse(value),
-									refresh_token = obj.refresh_token,
-									expires = obj.expires,
-									user_id = obj.user_id;
+							var obj, refresh_token, expires, user_id;
+							try {
+								obj = JSON.parse(value);
+								refresh_token = obj.refresh_token;
+								expires = obj.expires;
+								user_id = obj.user_id;
 								req._userId = user_id;
-								// get new access token
-								_refreshToken(refresh_token, function(result){
-									var new_access_token = result.access_token;
-
-									// save new access token
-									_updateAccessToken(access_token, new_access_token, {
-										refresh_token: refresh_token,
-										user_id: user_id,
-										expires: expires
-									});
-
-									// update authorization
-                  logger.info('Translating access_token to header and making new request.');
-									req.options.headers.Authorization = 'Bearer '+ new_access_token;
-
-									// redo the request
-									var new_request = _request(req.options, _parseResponse, _errorHandler, {
-										name: constants.AUTH_ACCESS_TOKEN_NAME,
-										value: new_access_token,
-										prop: { expires: expires ? new Date(expires) : null, path: '/api', httpOnly: true, secure: true }
-									});
-									if (req.method === 'POST'|| req.method === 'PATCH') {
-										new_request.write(req.body);
-									}
-									new_request.end();
-								}, function(){
-									// refresh token invalid, send back result as is
-									_parseResponse(proxy_response);
-								});
 							} catch(err) {
+								logger.error(err);
 								// JSON parsing failed, refresh token not found, send back the result as is
 								_parseResponse(proxy_response);
+								return;
 							}
-						}, function(){
+							// get new access token
+							_refreshToken(refresh_token, function(result){
+								var new_access_token = result && result.access_token;
+								if (!new_access_token) {
+									// Couldn't retrieve new access token, send back result as is
+									_parseResponse(proxy_response);
+									return;
+								}
+								// save new access token
+								_updateAccessToken(access_token, new_access_token, {
+									refresh_token: refresh_token,
+									user_id: user_id,
+									expires: expires
+								});
+								// update authorization
+								logger.info('Translating access_token to header and making new request.');
+								req.options.headers.Authorization = 'Bearer '+ new_access_token;
+
+								// redo the request
+								var new_request = _request(req.options, _parseResponse, _errorHandler, {
+									name: constants.AUTH_ACCESS_TOKEN_NAME,
+									value: new_access_token,
+									prop: { expires: expires ? new Date(expires) : null, path: '/api', httpOnly: true, secure: true }
+								});
+								if (req.method === 'POST'|| req.method === 'PATCH') {
+									new_request.write(req.body);
+								}
+								new_request.end();
+							}, function(err){
+								logger.error(err);
+								// refresh token invalid, send back result as is
+								_parseResponse(proxy_response);
+							});
+						}, function(err){
+							logger.error(err);
 							// Redis error, continue with response
 							_parseResponse(proxy_response);
 						});
