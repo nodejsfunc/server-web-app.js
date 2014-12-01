@@ -11,29 +11,32 @@ var auth = require('./../services/auth');
 router
 	.get(constants.SIGN_OUT_PATH, function (req, res) {
 		var access_token = req.cookies[constants.AUTH_ACCESS_TOKEN_NAME];
-    if (!access_token) {
-	    res.set('www-authenticate', constants.NO_TOKEN);
-	    res.send(401);
-	    return;
-    }
-		function errorHandler(err) {
-			res.clearCookie(constants.AUTH_ACCESS_TOKEN_NAME, { path: '/api' });
-			res.send(500);
-			logger.error(err);
+		if (!access_token) {
+			// User doesn't have access token, so is likely already logged out:
+			res.send(200);
+			return;
 		}
-    repository.get(access_token).then(function (data) {
-      try {
-        data = JSON.parse(data);
-        req._userId = data.user_id;
-        auth.revokeRefreshToken(data.refresh_token).then(function () {
-          repository.del(access_token);
-          res.clearCookie(constants.AUTH_ACCESS_TOKEN_NAME, { path: '/api' });
-          res.send(200);
-        }, errorHandler);
-      } catch (err) {
-	      errorHandler(err);
-      }
-    }, errorHandler);
+		function clearDataHandler() {
+			repository.del(access_token);
+			res.clearCookie(constants.AUTH_ACCESS_TOKEN_NAME, { path: '/api' });
+			res.send(200);
+		}
+		function errorHandler(err) {
+			logger.error(err);
+			clearDataHandler();
+		}
+		repository.get(access_token).then(function (data) {
+			var obj;
+			try {
+				obj = JSON.parse(data);
+			} catch (err) {
+				errorHandler(err);
+			}
+			if (obj) {
+				req._userId = obj.user_id;
+				auth.revokeRefreshToken(obj.refresh_token).then(clearDataHandler, errorHandler);
+			}
+		}, errorHandler);
 	})
 	.get(constants.CLIENT_CONFIG_PATH, function (req, res) {
 		// Require client config here so it reflects invalidation of the require cache on SIGHUP:
@@ -42,8 +45,8 @@ router
 	})
 	.post(constants.LOG_PATH, function (req, res) {
 		var timestamp = Date.now(),
-				startDate = new Date(timestamp),
-				data = req.body;
+			startDate = new Date(timestamp),
+			data = req.body;
 		if (!data || !data.message) {
 			throw(new Error('Missing log message.'));
 		}

@@ -29,119 +29,123 @@ describe('Local routing', function(){
 		server.close();
 	});
 
-  it('should return a 401 when we have not set the access_token cookie', function(done){
-    request
-      .get(constants.LOCAL_PATH + constants.SIGN_OUT_PATH)
-      .expect(401, done);
-  });
+	describe('sign out', function () {
 
-  it('should return an appropriate HTTP status if access_token cannot be found', function(done){
-    request
-      .get(constants.LOCAL_PATH + constants.SIGN_OUT_PATH)
-      .set('Cookie', 'access_token=does-not-exist')
-      .expect(500, function(err){
-        should.not.exist(err);
-        done();
-      });
-  });
+		it('should return a 200 without access_token', function(done){
+			request
+				.get(constants.LOCAL_PATH + constants.SIGN_OUT_PATH)
+				.expect(200, done);
+		});
 
-	it('should return local config object', function(done){
-		request
-			.get(constants.LOCAL_PATH + constants.CLIENT_CONFIG_PATH)
-			.expect(200, function(err, res){
-				should.not.exist(err);
-				should(res.body).containDeep(config.clientConfig);
-				done();
-			});
+		it('should return a 200 if access_token cannot be found', function(done){
+			request
+				.get(constants.LOCAL_PATH + constants.SIGN_OUT_PATH)
+				.set('Cookie', 'access_token=does-not-exist')
+				.expect(200, done);
+		});
+
+		it('should remove access_token cookie when accessing the sign out path', function(done){
+			nock('https://' + config.domains.auth.options.host)
+				.post(constants.REVOKE_REFRESH_TOKEN)
+				.reply(200);
+			request
+				.get(constants.LOCAL_PATH + constants.SIGN_OUT_PATH)
+				.set('Cookie', 'access_token=something-that-is-real-irl')
+				.expect('set-cookie', /access_token=; Path=\/api;/)
+				.expect(200, done);
+		});
+
+		it('should remove access_token from repository', function(done){
+			nock('https://' + config.domains.auth.options.host)
+				.post(constants.REVOKE_REFRESH_TOKEN)
+				.reply(200);
+			var spy = sinon.spy(repository, 'del');
+			request
+				.get(constants.LOCAL_PATH + constants.SIGN_OUT_PATH)
+				.set('Cookie', 'access_token=something-that-is-real-irl')
+				.expect(200, function(){
+					spy.calledOnce.should.equal(true);
+					spy.calledWith('something-that-is-real-irl').should.equal(true);
+					repository.del.restore();
+					done();
+				});
+		});
+
+		it('should revoke refresh_token on the auth server', function(done){
+			var authServer = nock('https://' + config.domains.auth.options.host)
+				.post(constants.REVOKE_REFRESH_TOKEN)
+				.reply(200);
+			request
+				.get(constants.LOCAL_PATH + constants.SIGN_OUT_PATH)
+				.set('Cookie', 'access_token=something-that-is-real-irl')
+				.expect(200, function(){
+					authServer.done();
+					done();
+				});
+		});
+
+		it('should reply with 200 even when we cannot revoke the refresh_token on the auth server', function(done){
+			nock('https://' + config.domains.auth.options.host)
+				.post(constants.REVOKE_REFRESH_TOKEN)
+				.reply(401);
+			request
+				.get(constants.LOCAL_PATH + constants.SIGN_OUT_PATH)
+				.set('Cookie', 'access_token=something-that-would-cause-an-error')
+				.expect(200, done);
+		});
+
 	});
 
-	it('should remove access_token cookie', function(done){
-    nock('https://' + config.domains.auth.options.host)
-      .post(constants.REVOKE_REFRESH_TOKEN)
-      .reply(200);
+	describe('client config', function () {
 
-		request
-			.get(constants.LOCAL_PATH + constants.SIGN_OUT_PATH)
-      .set('Cookie', 'access_token=something-that-is-real-irl')
-      .expect('set-cookie', /access_token=; Path=\/api;/)
-			.expect(200, done);
+		it('should return local config object', function(done){
+			request
+				.get(constants.LOCAL_PATH + constants.CLIENT_CONFIG_PATH)
+				.expect(200, function(err, res){
+					should.not.exist(err);
+					should(res.body).containDeep(config.clientConfig);
+					done();
+				});
+		});
+
 	});
 
-  it('should remove access_token from repository', function(done){
-    nock('https://' + config.domains.auth.options.host)
-        .post(constants.REVOKE_REFRESH_TOKEN)
-        .reply(200);
+	describe('log API', function () {
 
-    var spy = sinon.spy(repository, 'del');
+		it('should provide a logging API', function (done) {
+			request
+				.post(constants.LOCAL_PATH + constants.LOG_PATH)
+				.send({message: 'Client-side error occured.'})
+				.expect(200, done);
+		});
 
-    request
-        .get(constants.LOCAL_PATH + constants.SIGN_OUT_PATH)
-        .set('Cookie', 'access_token=something-that-is-real-irl')
-        .expect(200, function(){
-          spy.calledOnce.should.equal(true);
-          spy.calledWith('something-that-is-real-irl').should.equal(true);
-          repository.del.restore();
-          done();
-        });
-  });
+		it('Logging API should allow setting the log level', function (done) {
+			request
+				.post(constants.LOCAL_PATH + constants.LOG_PATH)
+				.send({message: 'Client-side error occured.', level: 'critical'})
+				.expect(200, done);
+		});
 
-  it('should revoke refresh_token on the auth server', function(done){
-    var authServer = nock('https://' + config.domains.auth.options.host)
-        .post(constants.REVOKE_REFRESH_TOKEN)
-        .reply(200);
+		it('Logging API should return 500 if no request body is sent', function (done) {
+			request
+				.post(constants.LOCAL_PATH + constants.LOG_PATH)
+				.expect(500, done);
+		});
 
-    request
-        .get(constants.LOCAL_PATH + constants.SIGN_OUT_PATH)
-        .set('Cookie', 'access_token=something-that-is-real-irl')
-        .expect(200, function(){
-          authServer.done();
-          done();
-        });
-  });
+		it('Logging API should return 500 if no message is sent', function (done) {
+			request
+				.post(constants.LOCAL_PATH + constants.LOG_PATH)
+				.send({})
+				.expect(500, done);
+		});
 
-  it('should fail when we cannot revoke the refresh_token on the auth server', function(done){
-    nock('https://' + config.domains.auth.options.host)
-      .post(constants.REVOKE_REFRESH_TOKEN)
-      .reply(500);
+		it('Logging API should return 500 if an invalid log level is sent', function (done) {
+			request
+				.post(constants.LOCAL_PATH + constants.LOG_PATH)
+				.send({message: 'Client-side error occured.', level: 'banana'})
+				.expect(500, done);
+		});
 
-    request
-      .get(constants.LOCAL_PATH + constants.SIGN_OUT_PATH)
-      .set('Cookie', 'access_token=something-that-would-cause-an-error')
-      .expect(500, done);
-  });
-
-	it('should provide a logging API', function (done) {
-		request
-			.post(constants.LOCAL_PATH + constants.LOG_PATH)
-			.send({message: 'Client-side error occured.'})
-			.expect(200, done);
-	});
-
-	it('Logging API should allow setting the log level', function (done) {
-		request
-			.post(constants.LOCAL_PATH + constants.LOG_PATH)
-			.send({message: 'Client-side error occured.', level: 'critical'})
-			.expect(200, done);
-	});
-
-	it('Logging API should return 500 if no request body is sent', function (done) {
-		request
-			.post(constants.LOCAL_PATH + constants.LOG_PATH)
-			.expect(500, done);
-	});
-
-	it('Logging API should return 500 if no message is sent', function (done) {
-		request
-			.post(constants.LOCAL_PATH + constants.LOG_PATH)
-			.send({})
-			.expect(500, done);
-	});
-
-	it('Logging API should return 500 if an invalid log level is sent', function (done) {
-		request
-			.post(constants.LOCAL_PATH + constants.LOG_PATH)
-			.send({message: 'Client-side error occured.', level: 'banana'})
-			.expect(500, done);
 	});
 
 });
