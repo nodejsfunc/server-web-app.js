@@ -35,6 +35,8 @@ router
 			if (obj) {
 				req._userId = obj.user_id;
 				auth.revokeRefreshToken(obj.refresh_token).then(clearDataHandler, errorHandler);
+			} else {
+				clearDataHandler();
 			}
 		}, errorHandler);
 	})
