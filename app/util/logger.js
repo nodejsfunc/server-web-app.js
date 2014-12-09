@@ -20,6 +20,7 @@ if (config.graylog.host && config.graylog.port) {
 	loggerMap = {
 		emergency: 'error',
 		critical: 'error',
+		warning: 'warn',
 		notice: 'log'
 	};
 }
@@ -46,7 +47,7 @@ logInterface = {};
 	'emergency',
 	'critical',
 	'error',
-	'warn',
+	'warning',
 	'notice',
 	'info'
 ].forEach(function (level) {
