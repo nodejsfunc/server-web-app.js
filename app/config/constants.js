@@ -29,5 +29,6 @@ module.exports = {
 	LIBRARY_PATH: '/service/my/library',
 	ADMIN_PATH: '/service/admin/users/',
 	ADMIN_CREDIT_PATH: 'credit',
+	VOUCHER_CAMPAIGNS_PATH: '/service/admin/gifting/vouchercampaigns',
 	NO_TOKEN: 'Bearer'
 };

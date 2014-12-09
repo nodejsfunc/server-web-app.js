@@ -1,7 +1,8 @@
 'use strict';
 
 var constants = require('./../config/constants'),
-		querystring = require('querystring');
+		querystring = require('querystring'),
+	logger = require('./../util/logger');
 
 module.exports = function(req, res, next){
 	// Require config here so it reflects invalidation of the require cache on SIGHUP:
@@ -44,6 +45,10 @@ module.exports = function(req, res, next){
       return req.options.path.indexOf(constants.VOUCHER_REDEMPTION_PATH) === 0;
     };
 
+		var _isAdminCampaignsService = function(){
+			return req.options.path.indexOf(constants.VOUCHER_CAMPAIGNS_PATH) === 0;
+		};
+
 		if((_isCreditCardService() ||
 			_isBasketService() ||
 			_isPurchaseService() ||
@@ -51,9 +56,11 @@ module.exports = function(req, res, next){
 			_isClubcardValidationService() ||
 			_isLibraryService() ||
       _isVoucherRedemptionService() ||
-			_isAdminCreditService()) &&
+			_isAdminCreditService() ||
+			_isAdminCampaignsService()) &&
 			req.headers['x-content-type'] && req.options.host === config.domains['secure-service'].options.host
 		){
+			logger.info('Reversing x-content-type');
 			// change the content type
 			req.options.headers['content-type'] = req.headers['x-content-type'];
 			// use json stringify instead of query stringify
