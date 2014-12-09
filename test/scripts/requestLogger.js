@@ -12,7 +12,7 @@ describe('Request logging test', function () {
 
 	beforeEach(function () {
 		sinon.spy(logger, 'info');
-		sinon.spy(logger, 'warn');
+		sinon.spy(logger, 'warning');
 		sinon.spy(logger, 'error');
 		var app = express();
 		app.use(middleware);
@@ -31,7 +31,7 @@ describe('Request logging test', function () {
 	afterEach(function () {
 		server.close();
 		logger.error.restore();
-		logger.warn.restore();
+		logger.warning.restore();
 		logger.info.restore();
 	});
 
@@ -55,7 +55,7 @@ describe('Request logging test', function () {
 			});
 	});
 
-	it('should log request meta data with warn level', function (done) {
+	it('should log request meta data with warning level', function (done) {
 		request
 			.get('/404')
 			.set({
@@ -63,8 +63,8 @@ describe('Request logging test', function () {
 				'x-requested-by': 'blinkbox'
 			})
 			.expect(404, function () {
-				sinon.assert.calledOnce(logger.warn);
-				sinon.assert.calledWithMatch(logger.warn, '', {
+				sinon.assert.calledOnce(logger.warning);
+				sinon.assert.calledWithMatch(logger.warning, '', {
 					appName: 'SWA',
 					httpAcceptEncoding: 'gzip, deflate',
 					httpUserAgent: 'banana user agent',
