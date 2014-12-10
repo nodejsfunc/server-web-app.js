@@ -111,11 +111,19 @@ module.exports = {
 		return defer.promise;
 	},
 	del: function(key){
+		var defer = Q.defer();
 		var keyHash = hash(key);
 		logger.info('Redis: calling delete key (sha1): '+ keyHash, {tokenHash: keyHash});
 		redis.del(key || null, function(err, res){
 			logger.info('Redis: delete ' + keyHash + ' returned '+ (err? ('Error: ' + err) : (res + ' keys deleted.') ), {tokenHash: keyHash} );
+			if(! err){
+				defer.resolve(res);
+			} else {
+				defer.reject(err);
+			}
 		});
+
+		return defer.promise;
 	},
 	exists: function(key){
 		var defer = Q.defer();
