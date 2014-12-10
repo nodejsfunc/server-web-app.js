@@ -32,7 +32,7 @@ process.on('SIGINT', function () {
 
 process.on('exit', function (code) {
 	if (code) {
-		logger.warn('Node.js server exiting with error code: ' + code);
+		logger.error('Node.js server exiting with error code: ' + code);
 	}
 });
 

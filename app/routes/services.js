@@ -51,7 +51,7 @@ router
 			if (status >= 500) {
 				logType = 'error';
 			} else if (status >= 400 && status !== 401) {
-				logType = 'warn';
+				logType = 'warning';
 			} else {
 				logType = 'info';
 			}

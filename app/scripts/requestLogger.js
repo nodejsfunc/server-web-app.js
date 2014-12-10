@@ -63,7 +63,7 @@ module.exports = function (req, res, next) {
 		if (statusCode >= 500) {
 			logType = 'error';
 		} else if (statusCode >= 400 && statusCode !== 401) {
-			logType = 'warn';
+			logType = 'warning';
 		}
 		logger[logType](message, log);
 	});
