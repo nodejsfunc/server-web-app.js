@@ -9,6 +9,53 @@ var express = require('express'),
 var auth = require('./../services/auth');
 
 router
+	// Generate a random number, send it to redis, make sure we can get it back again, then clean up and make sure it's gone.
+	.get(constants.HEALTHCHECK_PATH, function (req, res) {
+
+		try {
+			// Set our key
+			var healthcheck_key = "healthcheck_key_" + require("os").hostname();
+			var healthcheck_value = Math.random().toString();
+			repository.set(healthcheck_key, healthcheck_value);
+
+			// Get our key
+			repository.get(healthcheck_key).then(function(reply) {
+				var response_healthcheck_value = reply.toString();
+				if (response_healthcheck_value === healthcheck_value) {
+
+					var is_delete_good = false;
+					repository.del(healthcheck_key).then(function(reply) {
+						repository.get(healthcheck_key).then(function(reply) {
+							if (reply === null) {
+						// Everything is good
+						res.send(200, {
+							status: "OK",
+							value_in: healthcheck_key,
+							key_in: healthcheck_value,
+							key_out: response_healthcheck_value,
+						});
+							}
+						});
+					});
+
+				} else {
+					// Something went wrong.
+					res.send(503, {
+						// This purposefully not mentioning "redis" as this healthcheck is passed to the front
+						status: "Bad response from data source."
+					});
+				}
+			}, function (err) {
+				res.send(503, {
+					status: "Error: " + err
+				});
+			});
+		} catch(error) {
+			res.send(503);
+			// Send errors to log
+		}
+
+ 	})
 	.get(constants.SIGN_OUT_PATH, function (req, res) {
 		var access_token = req.cookies[constants.AUTH_ACCESS_TOKEN_NAME];
 		if (!access_token) {
