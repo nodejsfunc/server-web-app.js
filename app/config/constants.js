@@ -20,6 +20,7 @@ module.exports = {
 	BASE_PATH: '/api',
 	CLIENT_CONFIG_PATH: '/config',
 	LOG_PATH: '/log',
+	HEALTHCHECK_PATH: '/healthcheck',
 	CREDIT_CARD_PATH: '/service/my/creditcards',
   VOUCHER_REDEMPTION_PATH: '/service/gifting/voucher/',
 	BASKET_PATH: '/service/my/baskets',
