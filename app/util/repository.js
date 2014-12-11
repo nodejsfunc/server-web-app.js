@@ -76,53 +76,63 @@ redis.on('idle', function(){
 });
 
 module.exports = {
-	set: function(key, value){
+	set: function(key, value) {
+		var defer = Q.defer();
 		if (key && value) {
-			var keyHash = hash(key),
-				valueHash = hash(value);
-
-			// all redis entries are deleted after a certain time
-			logger.info('Redis: calling set - sha1(key): ' + keyHash +
-			', sha1(value): ' + valueHash + ', Expires in ' + constants.AUTH_MAX_AGE + ' ms', {tokenHash: keyHash});
-
-			redis.set(key, value, 'PX', constants.AUTH_MAX_AGE, function(result){
-				logger.info('Redis: set - sha1(key): ' + keyHash +
-				', sha1(value): ' + valueHash + ', Expires in ' + constants.AUTH_MAX_AGE + ' ms): ' +
-				'Returned ' + hash(result), {tokenHash: keyHash});
-
+			var keyHash = hash(key);
+			var valueHash = hash(value);
+			// all redis entries are deleted after AUTH_MAX_AGE
+			logger.info(
+				'Redis: calling set - sha1(key): ' + keyHash +
+					', sha1(value): ' + valueHash + ', Expires in ' + constants.AUTH_MAX_AGE + ' ms',
+				{tokenHash: keyHash}
+			);
+			redis.set(key, value, 'PX', constants.AUTH_MAX_AGE, function(err, result) {
+				logger.info(
+					'Redis: set - sha1(key): ' + keyHash +
+						', sha1(value): ' + valueHash + ', Expires in ' + constants.AUTH_MAX_AGE + ' ms): ' +
+						'Returned ' + hash(result),
+					{tokenHash: keyHash}
+				);
+				if (!err) {
+					defer.resolve(result);
+				} else {
+					defer.reject(err);
+				}
 			});
 		} else {
-			logger.error('Invalid arguments for redis SET command. (key: "' + key + '", value: "' + value + '")');
+			var reason = 'Invalid arguments for redis SET command. (key: "' + key + '", value: "' + value + '")';
+			logger.error(reason);
+			defer.reject(reason);
 		}
+		return defer.promise;
 	},
 	get: function(key){
 		var defer = Q.defer();
 		var keyHash = hash(key);
-		logger.info('Redis: Calling get key (sha1): ' +  keyHash);
-		redis.get(key, function(err, reply){
+		logger.info('Redis: Calling get key (sha1): ' +  keyHash, {tokenHash: keyHash});
+		redis.get(key, function(err, reply) {
 			logger.info('Redis: get ' + keyHash + ' returned ' + (err? err : hash(reply)), {tokenHash: keyHash});
-			if(! err){
+			if (!err) {
 				defer.resolve(reply);
 			} else {
 				defer.reject(err);
 			}
 		});
-
 		return defer.promise;
 	},
 	del: function(key){
 		var defer = Q.defer();
 		var keyHash = hash(key);
 		logger.info('Redis: calling delete key (sha1): '+ keyHash, {tokenHash: keyHash});
-		redis.del(key || null, function(err, res){
-			logger.info('Redis: delete ' + keyHash + ' returned '+ (err? ('Error: ' + err) : (res + ' keys deleted.') ), {tokenHash: keyHash} );
-			if(! err){
+		redis.del(key || null, function(err, res) {
+			logger.info('Redis: delete ' + keyHash + ' returned '+ (err? ('Error: ' + err) : (res + ' keys deleted.') ), {tokenHash: keyHash});
+			if (!err) {
 				defer.resolve(res);
 			} else {
 				defer.reject(err);
 			}
 		});
-
 		return defer.promise;
 	},
 	exists: function(key){
@@ -137,7 +147,6 @@ module.exports = {
 				defer.reject(err);
 			}
 		});
-
 		return defer.promise;
 	}
 };

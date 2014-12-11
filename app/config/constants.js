@@ -18,7 +18,6 @@ module.exports = {
 	LOCAL_PATH : '/api/local',
 	SIGN_OUT_PATH : '/signout',
 	BASE_PATH: '/api',
-	CLIENT_CONFIG_PATH: '/config',
 	LOG_PATH: '/log',
 	HEALTHCHECK_PATH: '/healthcheck',
 	CREDIT_CARD_PATH: '/service/my/creditcards',
