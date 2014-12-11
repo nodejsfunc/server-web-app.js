@@ -69,7 +69,7 @@ router
 	// Generate a random number, send it to redis, make sure we can get it back again, then clean up and make sure it's gone.
 	.get(constants.HEALTHCHECK_PATH, function (req, res) {
 		var healthcheck_key = 'healthcheck_key_' + require('os').hostname();
-		var healthcheck_value = Math.random();
+		var healthcheck_value = Math.random().toString();
 		repository.set(healthcheck_key, healthcheck_value).then(function () {
 			repository.get(healthcheck_key).then(function(result) {
 				if (result === healthcheck_value) {
