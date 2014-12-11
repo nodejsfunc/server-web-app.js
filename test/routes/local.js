@@ -3,7 +3,6 @@
 var express = require('express'),
 	constants = require('../../app/config/constants'),
 	config = require('../../app/config/config'),
-	should = require('should'),
 	cookieParser = require('cookie-parser'),
 	bodyParser = require('body-parser'),
 	routes = require('../../app/routes'),
@@ -96,20 +95,6 @@ describe('Local routing', function(){
 
 	});
 
-	describe('client config', function () {
-
-		it('should return local config object', function(done){
-			request
-				.get(constants.LOCAL_PATH + constants.CLIENT_CONFIG_PATH)
-				.expect(200, function(err, res){
-					should.not.exist(err);
-					should(res.body).containDeep(config.clientConfig);
-					done();
-				});
-		});
-
-	});
-
 	describe('log API', function () {
 
 		it('should provide a logging API', function (done) {
@@ -144,6 +129,192 @@ describe('Local routing', function(){
 				.post(constants.LOCAL_PATH + constants.LOG_PATH)
 				.send({message: 'Client-side error occured.', level: 'banana'})
 				.expect(500, done);
+		});
+
+	});
+
+	describe('healthcheck API', function () {
+
+		it('should return 200 OK is redis is working fine', function (done) {
+			var value;
+			sinon.stub(repository, 'set', function (k, v) {
+				value = v;
+				return {then: function (success) {success('OK');}};
+			});
+			sinon.stub(repository, 'get', function () {
+				return {then: function (success) {success(value);}};
+			});
+			sinon.stub(repository, 'del', function () {
+				return {then: function (success) {success(1);}};
+			});
+			sinon.stub(repository, 'exists', function () {
+				return {then: function (success) {success(0);}};
+			});
+			request
+				.get(constants.LOCAL_PATH + constants.HEALTHCHECK_PATH)
+				.expect(200, function () {
+					repository.set.restore();
+					repository.get.restore();
+					repository.del.restore();
+					repository.exists.restore();
+					done();
+				});
+		});
+
+		it('should return 503 Service unavailable if setting a key failed', function (done) {
+			var value;
+			sinon.stub(repository, 'set', function (k, v) {
+				value = v;
+				return {then: function (success, error) {error('Error');}};
+			});
+			sinon.stub(repository, 'get', function () {
+				return {then: function (success) {success(value);}};
+			});
+			sinon.stub(repository, 'del', function () {
+				return {then: function (success) {success(1);}};
+			});
+			sinon.stub(repository, 'exists', function () {
+				return {then: function (success) {success(0);}};
+			});
+			request
+				.get(constants.LOCAL_PATH + constants.HEALTHCHECK_PATH)
+				.expect(503, function () {
+					repository.set.restore();
+					repository.get.restore();
+					repository.del.restore();
+					repository.exists.restore();
+					done();
+				});
+		});
+
+		it('should return 503 Service unavailable if getting the value failed', function (done) {
+			var value;
+			sinon.stub(repository, 'set', function (k, v) {
+				value = v;
+				return {then: function (success) {success('OK');}};
+			});
+			sinon.stub(repository, 'get', function () {
+				return {then: function (success, error) {error('Error');}};
+			});
+			sinon.stub(repository, 'del', function () {
+				return {then: function (success) {success(1);}};
+			});
+			sinon.stub(repository, 'exists', function () {
+				return {then: function (success) {success(0);}};
+			});
+			request
+				.get(constants.LOCAL_PATH + constants.HEALTHCHECK_PATH)
+				.expect(503, function () {
+					repository.set.restore();
+					repository.get.restore();
+					repository.del.restore();
+					repository.exists.restore();
+					done();
+				});
+		});
+
+		it('should return 503 Service unavailable if deleting the key failed', function (done) {
+			var value;
+			sinon.stub(repository, 'set', function (k, v) {
+				value = v;
+				return {then: function (success) {success('OK');}};
+			});
+			sinon.stub(repository, 'get', function () {
+				return {then: function (success) {success(value);}};
+			});
+			sinon.stub(repository, 'del', function () {
+				return {then: function (success, error) {error('Error');}};
+			});
+			sinon.stub(repository, 'exists', function () {
+				return {then: function (success) {success(0);}};
+			});
+			request
+				.get(constants.LOCAL_PATH + constants.HEALTHCHECK_PATH)
+				.expect(503, function () {
+					repository.set.restore();
+					repository.get.restore();
+					repository.del.restore();
+					repository.exists.restore();
+					done();
+				});
+		});
+
+		it('should return 503 Service unavailable if the exist call failed', function (done) {
+			var value;
+			sinon.stub(repository, 'set', function (k, v) {
+				value = v;
+				return {then: function (success) {success('OK');}};
+			});
+			sinon.stub(repository, 'get', function () {
+				return {then: function (success) {success(value);}};
+			});
+			sinon.stub(repository, 'del', function () {
+				return {then: function (success) {success(1);}};
+			});
+			sinon.stub(repository, 'exists', function () {
+				return {then: function (success, error) {error('Error');}};
+			});
+			request
+				.get(constants.LOCAL_PATH + constants.HEALTHCHECK_PATH)
+				.expect(503, function () {
+					repository.set.restore();
+					repository.get.restore();
+					repository.del.restore();
+					repository.exists.restore();
+					done();
+				});
+		});
+
+		it('should return 503 Service unavailable if the returned value does not match the input value', function (done) {
+			var value;
+			sinon.stub(repository, 'set', function (k, v) {
+				value = v;
+				return {then: function (success) {success('OK');}};
+			});
+			sinon.stub(repository, 'get', function () {
+				return {then: function (success) {success('BANANA');}};
+			});
+			sinon.stub(repository, 'del', function () {
+				return {then: function (success) {success(1);}};
+			});
+			sinon.stub(repository, 'exists', function () {
+				return {then: function (success) {success(0);}};
+			});
+			request
+				.get(constants.LOCAL_PATH + constants.HEALTHCHECK_PATH)
+				.expect(503, function () {
+					repository.set.restore();
+					repository.get.restore();
+					repository.del.restore();
+					repository.exists.restore();
+					done();
+				});
+		});
+
+		it('should return 503 Service unavailable if the key was not deleted from redis', function (done) {
+			var value;
+			sinon.stub(repository, 'set', function (k, v) {
+				value = v;
+				return {then: function (success) {success('OK');}};
+			});
+			sinon.stub(repository, 'get', function () {
+				return {then: function (success) {success(value);}};
+			});
+			sinon.stub(repository, 'del', function () {
+				return {then: function (success) {success(1);}};
+			});
+			sinon.stub(repository, 'exists', function () {
+				return {then: function (success) {success(1);}};
+			});
+			request
+				.get(constants.LOCAL_PATH + constants.HEALTHCHECK_PATH)
+				.expect(200, function () {
+					repository.set.restore();
+					repository.get.restore();
+					repository.del.restore();
+					repository.exists.restore();
+					done();
+				});
 		});
 
 	});
