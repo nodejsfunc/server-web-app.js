@@ -430,7 +430,7 @@ router
 			proxy_request.abort();
 		});
 
-		if (req.method === 'POST'|| req.method === 'PATCH') {
+		if (req.method === 'POST'|| req.method === 'PATCH' || req.method === 'PUT') {
 			proxy_request.write(req.body);
 		}
 		proxy_request.end();
