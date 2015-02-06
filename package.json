@@ -1,9 +1,9 @@
 {
-  "name": "BlinkNode",
+  "name": "Server Web App",
   "version": "1.8.0",
   "repository": {
     "type": "git",
-    "url": "https://git.mobcastdev.com/Website/web-app.git"
+    "url": "https://github.com/blinkboxbooks/server-web-app.js"
   },
   "dependencies": {
     "express": "4.0.0",
