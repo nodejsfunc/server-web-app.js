@@ -14,7 +14,7 @@ $ node app.js -env development
 </code>
 
 <h4>Package json:</h4>
-```js
+```json
     {
       "name": "BlinkNode",
       "version": "0.0.0-0",
