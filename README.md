@@ -7,14 +7,14 @@ Server Web App
 $ npm install
 </code>
 
-<h3>Running the application</h3>
+## Running the application
 
-<code>
-$ node app.js -env development
+    node app.js -env development
 </code>
 
-<h4>Package json:</h4>
-```json
+### Package json:
+
+```
     {
       "name": "BlinkNode",
       "version": "0.0.0-0",
